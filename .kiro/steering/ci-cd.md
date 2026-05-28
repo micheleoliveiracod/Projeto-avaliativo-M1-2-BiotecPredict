@@ -42,8 +42,8 @@ Automatizar testes, lint, documentação e deploy através de GitHub Actions, ga
 **Arquivo:** `.github/workflows/ci.yml`
 
 **Trigger:**
-- Push em branches: main, develop, feature/*, bugfix/*, hotfix/*
-- Pull requests para main e develop
+- Push em branches: main, feature/*, bugfix/*, hotfix/*
+- Pull requests para main
 - **Exclusões (paths-ignore):**
   - `docs/**` - Documentação pura
   - `.kiro/steering/**` - Steering files
@@ -51,9 +51,11 @@ Automatizar testes, lint, documentação e deploy através de GitHub Actions, ga
   - `*.md` - Arquivos markdown
 
 **Nota Importante:** 
+- Branch `develop` NÃO dispara testes (apenas integração de branches)
 - Branches `chore/*` e `docs/*` NÃO disparam este workflow
 - **Sprint 0 (chore/sprint-0-setup-gerenciamento-projeto) NÃO dispara testes CI/CD**
 - Testes CI/CD começam em Sprint 1 com branches `feature/*`
+- PRs para `develop` não disparam testes (apenas para `main`)
 
 **Jobs:**
 

@@ -2,14 +2,14 @@ name: CI - Lint & Tests
 
 on:
   push:
-    branches: [ main, develop, feature/*, bugfix/*, hotfix/* ]
+    branches: [ main, feature/*, bugfix/*, hotfix/* ]
     paths-ignore:
       - 'docs/**'
       - '.kiro/steering/**'
       - '.github/issue_template/**'
       - '*.md'
   pull_request:
-    branches: [ main, develop ]
+    branches: [ main ]
     paths-ignore:
       - 'docs/**'
       - '.kiro/steering/**'
