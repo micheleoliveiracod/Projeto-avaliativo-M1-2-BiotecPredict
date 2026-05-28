@@ -187,11 +187,12 @@ Para branches `release/` mergeando em `main`:
 Para branches `hotfix/` mergeando em `main` e `develop`:
 - Usar **merge commit** — mantém rastreabilidade da correção urgente
 
-| Tipo de branch | Destino | Estratégia | CI/CD |
-|---|---|---|---|
-| `feature/`, `bugfix/`, `chore/`, `docs/` | `develop` | Squash merge | ✅ Completo |
-| `release/` | `main` | Merge commit | ⚠️ Lint only |
-| `hotfix/` | `main` e `develop` | Merge commit | ✅ Completo |
+| Tipo de branch | Destino | Estratégia | CI/CD | Sprint |
+|---|---|---|---|---|
+| `chore/sprint-0-setup-gerenciamento-projeto` | `develop` | Squash merge | ❌ Nenhum | Sprint 0 |
+| `feature/*`, `bugfix/*` | `develop` | Squash merge | ✅ Completo | Sprint 1+ |
+| `hotfix/*` | `main` e `develop` | Merge commit | ✅ Completo | Qualquer |
+| `release/*` | `main` | Merge commit | ⚠️ Lint only | Qualquer |
 
 ---
 
@@ -199,7 +200,7 @@ Para branches `hotfix/` mergeando em `main` e `develop`:
 
 ### Branches com CI/CD Completo (Lint + Unit + Integration + E2E)
 
-- `feature/*` - Novas funcionalidades
+- `feature/*` - Novas funcionalidades (Sprint 1+)
 - `bugfix/*` - Correções de bugs
 - `hotfix/*` - Correções urgentes
 - `main` - Produção
@@ -211,13 +212,17 @@ Para branches `hotfix/` mergeando em `main` e `develop`:
 
 ### Branches sem CI/CD (Nenhum Teste)
 
-- `chore/*` - Gerenciamento/configuração
+- `chore/*` - Gerenciamento/configuração (Sprint 0 e manutenção)
 - `docs/*` - Documentação pura
 
 **Justificativa:**
+- **Sprint 0 (chore/*)**: Apenas estrutura e automação, sem código de aplicação
+- **Sprint 1+ (feature/*)**: Código com testes, CI/CD completo
 - `chore/*` e `docs/*` não contêm código que afeta funcionalidade
 - `release/*` já passou por testes completos em `develop`, apenas valida formatação
 - Evita falsos positivos e desperdício de recursos
+
+**Importante**: Sprint 0 NÃO dispara testes CI/CD. Testes começam em Sprint 1.
 
 ---
 
@@ -273,114 +278,143 @@ Organização detalhada dos 6 sprints com 5 issues cada (total de 30 issues) e 3
 
 | Sprint | Branches | Total |
 |--------|----------|-------|
-| **Sprint 0** | `feature/project-structure`, `feature/database-setup`, `feature/fastapi-setup`, `feature/react-setup`, `chore/create-issues-milestones` | 5 |
+| **Sprint 0** | `chore/sprint-0-setup-gerenciamento-projeto` | 1 |
 | **Sprint 1** | `feature/sqlalchemy-models`, `feature/pydantic-schemas`, `feature/upload-endpoint`, `feature/query-endpoints`, `feature/backend-unit-tests` | 5 |
 | **Sprint 2** | `feature/home-upload-page`, `feature/dashboard-kpis`, `feature/batch-table`, `feature/api-integration`, `feature/frontend-e2e-tests` | 5 |
 | **Sprint 3** | `feature/compliance-score-engine`, `feature/ml-pipeline-randomforest`, `feature/model-training`, `feature/ml-analytics-page`, `feature/ml-tests` | 5 |
 | **Sprint 4** | `feature/backend-pytest-coverage`, `feature/frontend-vitest-coverage`, `feature/postman-integration-tests`, `feature/cypress-e2e-tests`, `feature/coverage-validation` | 5 |
 | **Sprint 5** | `feature/swagger-documentation`, `feature/dev-guides`, `feature/data-validation-scripts`, `feature/compliance-validation-scripts`, `release/v1.0.0` | 5 |
-| **TOTAL** | | **30** |
+| **TOTAL** | | **26** |
 
 ---
 
 ## Sprint 0 — Setup e Gerenciamento (5 Issues)
 
 ### Macro Escopo
-Estabelecer a base de gerenciamento do projeto com estrutura, documentação e configurações de automação.
+Estabelecer a base de gerenciamento do projeto com estrutura de diretórios, documentação estratégica, configurações de automação e workflows CI/CD. **Sem código de backend/frontend e sem testes CI/CD**.
 
 ### Período
 24/05/2026 (sexta) até 26/05/2026 (domingo) — 3 dias
 
-### Issues (5 total)
+### Branch Única
+- **Branch**: `chore/sprint-0-setup-gerenciamento-projeto`
+- **Todos os commits do Sprint 0 devem ser feitos nesta branch**
+- **Merge em develop com squash merge**
 
-#### #1 - setup: estruturar repositório e diretórios base
-- **Branch**: `feature/project-structure`
-- **Labels**: setup, backend, frontend, sprint-0
+### Issues (5 total - Todas em chore/)
+
+#### #1 - chore: criar estrutura de diretórios base
+- **Branch**: `chore/sprint-0-setup-gerenciamento-projeto`
+- **Labels**: setup, chore, sprint-0
 - **Milestone**: Sprint 0 - Setup
 - **Descrição**: Criar estrutura de diretórios conforme `.kiro/steering/structure.md`
 - **Checklist de Atividades**:
-  - [ ] Criar diretórios backend (api/, processors/, services/, models/, schemas/, db/, ml/, scripts/, reports/, tests/)
-  - [ ] Criar diretórios frontend (src/components/, src/pages/, src/services/, src/hooks/, src/utils/)
+  - [ ] Criar diretórios backend (api/, processors/, services/, models/, schemas/, db/, ml/, scripts/, reports/, tests/) com .gitkeep
+  - [ ] Criar diretórios frontend (src/, components/, pages/, services/, hooks/, utils/) com .gitkeep
+  - [ ] Criar diretórios .kiro/ (.kiro/hooks/, .kiro/scripts/, .kiro/specs/, .kiro/steering/)
+  - [ ] Criar diretórios .github/ (.github/workflows/, .github/issue_template/)
+  - [ ] Criar diretórios scripts/ para automação
   - [ ] Criar arquivos README.md em diretórios principais
   - [ ] Configurar .gitignore para Python e React
   - [ ] Criar arquivos iniciais (requirements.txt, package.json)
 - **Critérios de Aceitação**:
   - [ ] Estrutura de diretórios criada conforme especificação
-  - [ ] Projeto pode ser inicializado localmente
+  - [ ] Todos os .gitkeep presentes
   - [ ] Todos os .gitignore configurados corretamente
 
-#### #2 - setup: configurar banco de dados PostgreSQL e ORM
-- **Branch**: `feature/database-setup`
-- **Labels**: setup, database, backend, sprint-0
+#### #2 - chore: criar documentação estratégica em .kiro/steering/
+- **Branch**: `chore/sprint-0-setup-gerenciamento-projeto`
+- **Labels**: setup, chore, documentation, sprint-0
 - **Milestone**: Sprint 0 - Setup
-- **Descrição**: Configurar SQLAlchemy e conexão com PostgreSQL
+- **Descrição**: Criar steering files com contexto permanente do projeto
 - **Checklist de Atividades**:
-  - [ ] Criar modelos SQLAlchemy (Batch, SensorReading, Prediction)
-  - [ ] Implementar repository pattern
-  - [ ] Configurar conexão com SQLite (dev) e PostgreSQL (prod)
-  - [ ] Criar migrations iniciais
-  - [ ] Implementar funções CRUD básicas
+  - [ ] Criar tech.md (stack tecnológica)
+  - [ ] Criar structure.md (estrutura do projeto)
+  - [ ] Criar requirements.md (requisitos funcionais)
+  - [ ] Criar product.md (visão do produto)
+  - [ ] Criar gitflow.md (fluxo Git e sprints)
+  - [ ] Criar ci-cd.md (workflows GitHub Actions)
+  - [ ] Criar compliance.md (conformidade e rastreabilidade)
+  - [ ] Criar deploy.md (instruções de deploy)
+  - [ ] Criar localizacao.md (timezone e idioma)
 - **Critérios de Aceitação**:
-  - [ ] Modelos SQLAlchemy funcionando
-  - [ ] Conexão com banco de dados testada
-  - [ ] Migrations executadas com sucesso
+  - [ ] Todos os steering files criados
+  - [ ] Documentação completa e consistente
+  - [ ] Referências cruzadas funcionando
 
-#### #3 - setup: configurar FastAPI e endpoints base
-- **Branch**: `feature/fastapi-setup`
-- **Labels**: setup, backend, api, sprint-0
+#### #3 - chore: configurar workflows GitHub Actions
+- **Branch**: `chore/sprint-0-setup-gerenciamento-projeto`
+- **Labels**: setup, chore, ci-cd, sprint-0
 - **Milestone**: Sprint 0 - Setup
-- **Descrição**: Configurar FastAPI com estrutura base
+- **Descrição**: Criar workflows CI/CD que disparam apenas em Sprint 1+
 - **Checklist de Atividades**:
-  - [ ] Criar main.py com FastAPI app
-  - [ ] Configurar CORS e middleware
-  - [ ] Criar estrutura de rotas (api/routes/)
-  - [ ] Implementar health check endpoint
-  - [ ] Configurar documentação Swagger
+  - [ ] Criar ci.yml (lint + testes para feature/*, bugfix/*, hotfix/*)
+  - [ ] Criar release-lint.yml (lint only para release/*)
+  - [ ] Criar cd.yml (deploy em main)
+  - [ ] Criar project-automation.yml (automação de board)
+  - [ ] Criar progress-report.yml (relatório semanal)
+  - [ ] Criar velocity-analysis.yml (análise de velocidade)
+  - [ ] Criar metrics-dashboard.yml (dashboard de métricas)
+  - [ ] Criar docs-generation.yml (geração de docs)
+  - [ ] Criar ai-test-generation.yml (geração de testes com IA)
+  - [ ] **Garantir que Sprint 0 (chore/*) NÃO dispara CI/CD de testes**
 - **Critérios de Aceitação**:
-  - [ ] FastAPI rodando localmente
-  - [ ] Swagger acessível em /docs
-  - [ ] Health check respondendo
+  - [ ] Todos os workflows criados
+  - [ ] Workflows testados e funcionando
+  - [ ] Sprint 0 não dispara testes CI/CD
 
-#### #4 - setup: configurar React e estrutura de componentes
-- **Branch**: `feature/react-setup`
-- **Labels**: setup, frontend, ui, sprint-0
-- **Milestone**: Sprint 0 - Setup
-- **Descrição**: Configurar React com Vite e estrutura base
-- **Checklist de Atividades**:
-  - [ ] Criar projeto React com Vite
-  - [ ] Configurar TailwindCSS
-  - [ ] Criar estrutura de componentes base
-  - [ ] Configurar roteamento (React Router)
-  - [ ] Criar serviço de API (Axios)
-- **Critérios de Aceitação**:
-  - [ ] React rodando localmente
-  - [ ] Componentes base criados
-  - [ ] Roteamento funcionando
-
-#### #5 - setup: criar issues e milestones do projeto
-- **Branch**: `chore/create-issues-milestones`
+#### #4 - chore: criar templates de issues e PRs
+- **Branch**: `chore/sprint-0-setup-gerenciamento-projeto`
 - **Labels**: setup, chore, sprint-0
 - **Milestone**: Sprint 0 - Setup
-- **Descrição**: Criar todas as 30 issues e 6 milestones no GitHub
+- **Descrição**: Criar templates estruturados para issues e PRs
 - **Checklist de Atividades**:
-  - [ ] Criar 6 milestones (Sprint 0-5)
-  - [ ] Criar 30 issues (5 por sprint)
-  - [ ] Adicionar labels apropriadas
-  - [ ] Configurar GitHub Project Board
-  - [ ] Adicionar issues ao board
+  - [ ] Criar bug_report.yml
+  - [ ] Criar feature.yml
+  - [ ] Criar chore.yml
+  - [ ] Criar documentation.yml
+  - [ ] Criar general.yml
+  - [ ] Criar pull_request_template.md
+  - [ ] Criar config.yml para templates
+  - [ ] Adicionar labels padrão
 - **Critérios de Aceitação**:
-  - [ ] Todas as 30 issues criadas
-  - [ ] Milestones configurados
-  - [ ] Board Kanban funcional
+  - [ ] Todos os templates criados
+  - [ ] Templates testados no GitHub
+  - [ ] Labels configurados
 
-### Branches (5 total)
+#### #5 - chore: criar scripts de automação e hooks Kiro
+- **Branch**: `chore/sprint-0-setup-gerenciamento-projeto`
+- **Labels**: setup, chore, automation, sprint-0
+- **Milestone**: Sprint 0 - Setup
+- **Descrição**: Criar scripts Python e hooks Kiro para automação
+- **Checklist de Atividades**:
+  - [ ] Criar log_prompt.py (logging de prompts)
+  - [ ] Criar create_all_issues.py (criação de issues)
+  - [ ] Criar create_branches.py (criação de branches)
+  - [ ] Criar manage_project.py (gerenciamento de projeto)
+  - [ ] Criar hooks Kiro (prompt-logger.json, generate-tests.json, etc)
+  - [ ] Criar README.md em scripts/
+  - [ ] Criar README.md em .kiro/hooks/
+  - [ ] Testar scripts localmente
+- **Critérios de Aceitação**:
+  - [ ] Todos os scripts criados e funcionando
+  - [ ] Hooks Kiro configurados
+  - [ ] Documentação de scripts completa
+
+### Branches (1 total)
 
 ```
-feature/project-structure
-feature/database-setup
-feature/fastapi-setup
-feature/react-setup
-chore/create-issues-milestones
+chore/sprint-0-setup-gerenciamento-projeto
+```
+
+### Fluxo de Merge Sprint 0
+
+```
+1. Todos os commits em chore/sprint-0-setup-gerenciamento-projeto
+2. Squash merge em develop
+3. Tag: v0.0.1-alpha
+4. Deletar branch
+5. Sprint 1 começa com backend/frontend
 ```
 
 ---
@@ -388,10 +422,15 @@ chore/create-issues-milestones
 ## Sprint 1 — Backend + API + Modelos (5 Issues)
 
 ### Macro Escopo
-Implementar backend FastAPI com modelos de dados, schemas de validação e endpoints REST para processamento de batches.
+Implementar backend FastAPI com modelos de dados, schemas de validação e endpoints REST para processamento de batches. **Primeira sprint com código e testes CI/CD**.
 
 ### Período
 27/05/2026 (segunda) — 1 dia
+
+### Estrutura de Branches
+- 5 branches `feature/*` independentes
+- Cada branch com seu próprio código e testes
+- CI/CD completo (lint + testes) dispara em cada push
 
 ### Issues (5 total)
 

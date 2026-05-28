@@ -12,10 +12,17 @@ Automatizar testes, lint, documentação e deploy através de GitHub Actions, ga
 
 ## ⚠️ IMPORTANTE: Política de Workflows
 
-### Workflows de CI/CD (Lint + Testes)
+### Sprint 0 - Sem CI/CD
+- ❌ **Sprint 0 (chore/sprint-0-setup-gerenciamento-projeto) NÃO dispara nenhum workflow de testes**
+- ✅ Apenas estrutura, documentação e automação
+- ✅ Sem código de backend/frontend
+- ✅ Sem testes CI/CD ou E2E
+
+### Workflows de CI/CD (Lint + Testes) - Sprint 1+
 - ✅ Executam APENAS em: `feature/*`, `bugfix/*`, `hotfix/*`, `main`, `develop`
 - ❌ NÃO executam em: `chore/*`, `docs/*`, `release/*`
 - 🔧 Path filters excluem: `docs/**`, `.kiro/steering/**`, `.github/issue_template/**`, `*.md`
+- **Nota**: Sprint 0 (chore/*) NÃO dispara este workflow
 
 ### Workflows de Automação de Projeto (Project Board, Issues, PRs)
 - ✅ Executam em TODAS as branches (feature/*, bugfix/*, hotfix/*, chore/*, docs/*, release/*, main, develop)
@@ -43,7 +50,10 @@ Automatizar testes, lint, documentação e deploy através de GitHub Actions, ga
   - `.github/issue_template/**` - Templates de issues
   - `*.md` - Arquivos markdown
 
-**Nota:** Branches `chore/*` e `docs/*` NÃO disparam este workflow
+**Nota Importante:** 
+- Branches `chore/*` e `docs/*` NÃO disparam este workflow
+- **Sprint 0 (chore/sprint-0-setup-gerenciamento-projeto) NÃO dispara testes CI/CD**
+- Testes CI/CD começam em Sprint 1 com branches `feature/*`
 
 **Jobs:**
 
