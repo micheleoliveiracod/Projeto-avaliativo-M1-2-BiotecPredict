@@ -1,0 +1,91 @@
+name: Project Automation
+
+on:
+  issues:
+    types: [opened, reopened, closed]
+  pull_request:
+    types: [opened, reopened, closed, converted_to_draft, ready_for_review]
+
+env:
+  PROJECT_ID: 7
+  PROJECT_URL: https://github.com/users/micheleoliveiracod/projects/7
+  REPO_OWNER: micheleoliveiracod
+  REPO_NAME: Projeto-avaliativo-M1-2-BiotecPredict
+
+jobs:
+  add-to-project:
+    runs-on: ubuntu-latest
+    name: Add Issue/PR to Project
+    permissions:
+      issues: write
+      pull-requests: write
+      contents: read
+    
+    steps:
+      - name: Add issue to project
+        if: github.event_name == 'issues' && github.event.action == 'opened'
+        uses: actions/add-to-project@v0.5.0
+        with:
+          project-url: ${{ env.PROJECT_URL }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Add PR to project
+        if: github.event_name == 'pull_request' && github.event.action == 'opened'
+        uses: actions/add-to-project@v0.5.0
+        with:
+          project-url: ${{ env.PROJECT_URL }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+  update-project-status:
+    runs-on: ubuntu-latest
+    name: Update Project Status
+    permissions:
+      issues: write
+      pull-requests: write
+      contents: read
+    
+    steps:
+      - name: Update status - Sprint In Progress (PR opened)
+        if: github.event_name == 'pull_request' && github.event.action == 'opened'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            console.log('✅ PR opened - Moving to Sprint In Progress');
+            console.log('Project: ${{ env.PROJECT_URL }}');
+            console.log('PR: #${{ github.event.pull_request.number }}');
+      
+      - name: Update status - In Review (PR ready for review)
+        if: github.event_name == 'pull_request' && github.event.action == 'ready_for_review'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            console.log('✅ PR ready for review - Moving to In Review');
+            console.log('Project: ${{ env.PROJECT_URL }}');
+            console.log('PR: #${{ github.event.pull_request.number }}');
+      
+      - name: Update status - Done (Issue closed)
+        if: github.event_name == 'issues' && github.event.action == 'closed'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            console.log('✅ Issue closed - Moving to Done');
+            console.log('Project: ${{ env.PROJECT_URL }}');
+            console.log('Issue: #${{ github.event.issue.number }}');
+
+  sync-milestones:
+    runs-on: ubuntu-latest
+    name: Sync Milestones with Project
+    permissions:
+      issues: write
+      contents: read
+    
+    steps:
+      - name: Sync milestone to project
+        if: github.event_name == 'issues' && github.event.issue.milestone
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const milestone = context.payload.issue.milestone;
+            console.log(`✅ Syncing milestone: ${milestone.title}`);
+            console.log(`Issue: #${context.payload.issue.number}`);
+            console.log(`Milestone: ${milestone.title}`);

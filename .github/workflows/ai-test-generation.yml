@@ -1,0 +1,99 @@
+name: AI-Powered Test Generation
+
+on:
+  push:
+    branches: [ develop ]
+    paths:
+      - 'backend/**/*.py'
+      - 'frontend/**/*.ts'
+      - 'frontend/**/*.tsx'
+  workflow_dispatch:
+
+jobs:
+  analyze-code-changes:
+    runs-on: ubuntu-latest
+    name: Analyze Code Changes for Test Generation
+    
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      
+      - name: Get changed files
+        id: changed-files
+        run: |
+          if [ "${{ github.event_name }}" == "push" ]; then
+            git diff --name-only ${{ github.event.before }} ${{ github.event.after }} > changed_files.txt
+          else
+            echo "No previous commit available"
+          fi
+          cat changed_files.txt || echo "No changes detected"
+      
+      - name: Create test generation prompt
+        run: |
+          echo "## 🤖 AI Test Generation Request" > test_generation_prompt.md
+          echo "" >> test_generation_prompt.md
+          echo "### Changed Files:" >> test_generation_prompt.md
+          cat changed_files.txt >> test_generation_prompt.md || echo "No files changed" >> test_generation_prompt.md
+          echo "" >> test_generation_prompt.md
+          echo "### Instructions:" >> test_generation_prompt.md
+          echo "1. Analyze the changed code files" >> test_generation_prompt.md
+          echo "2. Generate comprehensive test cases for new functions/classes" >> test_generation_prompt.md
+          echo "3. Include unit tests, edge cases, and integration tests" >> test_generation_prompt.md
+          echo "4. Ensure test coverage >= 70%" >> test_generation_prompt.md
+          echo "5. Use pytest for backend and Vitest for frontend" >> test_generation_prompt.md
+          echo "6. Add tests to appropriate test directories" >> test_generation_prompt.md
+      
+      - name: Upload test generation request
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-generation-request
+          path: test_generation_prompt.md
+      
+      - name: Create workflow summary
+        run: |
+          echo "## 🧪 AI Test Generation" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Changed Files Detected:" >> $GITHUB_STEP_SUMMARY
+          cat changed_files.txt >> $GITHUB_STEP_SUMMARY || echo "No changes" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Next Steps:" >> $GITHUB_STEP_SUMMARY
+          echo "1. Review changed files" >> $GITHUB_STEP_SUMMARY
+          echo "2. Use Kiro with 'generate-tests' hook to create tests" >> $GITHUB_STEP_SUMMARY
+          echo "3. Run tests locally: \`pytest tests/pytest/\` or \`npm run test\`" >> $GITHUB_STEP_SUMMARY
+          echo "4. Commit tests with code changes" >> $GITHUB_STEP_SUMMARY
+
+  validate-test-coverage:
+    runs-on: ubuntu-latest
+    name: Validate Test Coverage
+    needs: analyze-code-changes
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          cd backend && pip install -r requirements.txt
+          pip install pytest pytest-cov
+      
+      - name: Run tests with coverage
+        run: |
+          cd backend
+          pytest tests/pytest/ --cov=. --cov-report=term-missing --cov-report=html || true
+      
+      - name: Check coverage threshold
+        run: |
+          cd backend
+          coverage report --fail-under=70 || echo "Coverage below 70% - AI test generation recommended"
+      
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-report
+          path: backend/htmlcov

@@ -1,0 +1,46 @@
+name: CD - Deploy
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+    # Excluir branches de documentação
+    paths-ignore:
+      - 'docs/**'
+      - '.kiro/steering/**'
+      - '*.md'
+  workflow_run:
+    workflows: [ "CI - Lint & Tests" ]
+    types: [ completed ]
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: Deploy to Production
+    if: github.event.workflow_run.conclusion == 'success' || github.event_name == 'push'
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      
+      - name: Build Docker images
+        run: |
+          docker-compose -f deploy/docker-compose.yml build
+      
+      - name: Run health checks
+        run: |
+          docker-compose -f deploy/docker-compose.yml up -d
+          sleep 10
+          curl -f http://localhost:8000/health || exit 1
+          docker-compose -f deploy/docker-compose.yml down
+      
+      - name: Create deployment summary
+        run: |
+          echo "## 🚀 Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch**: ${{ github.ref }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Status**: ✅ Ready for deployment" >> $GITHUB_STEP_SUMMARY
