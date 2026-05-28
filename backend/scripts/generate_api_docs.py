@@ -9,10 +9,10 @@ Usage:
     python generate_api_docs.py --output docs/API.md
 """
 
-import sys
 import json
+import sys
 from pathlib import Path
-from typing import Dict, List, Any
+from typing import Any, Dict, List
 
 
 def generate_api_docs(output_file: str = 'docs/API.md') -> None:

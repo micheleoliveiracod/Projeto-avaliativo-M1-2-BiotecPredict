@@ -10,11 +10,11 @@ Usage:
     python generate_docstrings.py --file backend/services/batch_service.py
 """
 
-import os
 import ast
+import os
 import sys
 from pathlib import Path
-from typing import List, Dict, Any
+from typing import Any, Dict, List
 
 
 class DocstringGenerator(ast.NodeVisitor):
