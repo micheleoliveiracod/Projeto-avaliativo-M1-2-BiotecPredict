@@ -187,12 +187,12 @@ Para branches `release/` mergeando em `main`:
 Para branches `hotfix/` mergeando em `main` e `develop`:
 - Usar **merge commit** — mantém rastreabilidade da correção urgente
 
-| Tipo de branch | Destino | Estratégia | CI/CD | Sprint |
+| Tipo de branch | Destino | Estratégia | CI/CD | Validação |
 |---|---|---|---|---|
-| `chore/sprint-0-setup-gerenciamento-projeto` | `develop` | Squash merge | ❌ Nenhum | Sprint 0 |
-| `feature/*`, `bugfix/*` | `develop` | Squash merge | ✅ Completo | Sprint 1+ |
-| `hotfix/*` | `main` e `develop` | Merge commit | ✅ Completo | Qualquer |
-| `release/*` | `main` | Merge commit | ⚠️ Lint only | Qualquer |
+| `chore/sprint-0-setup-gerenciamento-projeto` | `develop` | Squash merge | ❌ Nenhum | ❌ Nenhuma |
+| `feature/*`, `bugfix/*` | `develop` | Squash merge | ✅ Completo | ✅ PR valida |
+| `hotfix/*` | `main` e `develop` | Merge commit | ✅ Completo | ✅ PR valida |
+| `release/*` | `main` | Merge commit | ⚠️ Lint only | ✅ PR valida |
 
 ---
 
@@ -203,26 +203,26 @@ Para branches `hotfix/` mergeando em `main` e `develop`:
 - `feature/*` - Novas funcionalidades (Sprint 1+)
 - `bugfix/*` - Correções de bugs
 - `hotfix/*` - Correções urgentes
-- `main` - Produção
-- `develop` - Integração
 
-### Branches com Lint Only (Sem Testes)
+### Branches SEM CI/CD (Sem Testes)
 
-- `release/*` - Preparação de release (apenas lint, sem testes)
-
-### Branches sem CI/CD (Nenhum Teste)
-
+- `develop` - Integração de branches (testes já foram feitos)
+- `main` - Produção (testes já foram feitos)
 - `chore/*` - Gerenciamento/configuração (Sprint 0 e manutenção)
 - `docs/*` - Documentação pura
+- `release/*` - Preparação de release (apenas lint, sem testes)
+
+### Pull Requests com Validação
+
+- PRs para `develop` e `main` disparam testes como validação final
+- Garante que código foi testado antes de merge
 
 **Justificativa:**
-- **Sprint 0 (chore/*)**: Apenas estrutura e automação, sem código de aplicação
-- **Sprint 1+ (feature/*)**: Código com testes, CI/CD completo
-- `chore/*` e `docs/*` não contêm código que afeta funcionalidade
-- `release/*` já passou por testes completos em `develop`, apenas valida formatação
-- Evita falsos positivos e desperdício de recursos
-
-**Importante**: Sprint 0 NÃO dispara testes CI/CD. Testes começam em Sprint 1.
+- **Sem redundância**: Testes feitos UMA VEZ nas branches de trabalho
+- **Eficiência**: Não repete testes em develop/main
+- **Validação**: PRs garantem que código passou em testes
+- **Sprint 0**: Sem testes (apenas setup)
+- **Sprint 1+**: Testes em feature/*, bugfix/*, hotfix/*
 
 ---
 
