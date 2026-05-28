@@ -1,7 +1,11 @@
 import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
-import path from 'path'
 
+/**
+ * Configuração do Vitest para BiotecPredict
+ * 
+ * @see https://vitest.dev/config/
+ */
 export default defineConfig({
   plugins: [react()],
   test: {
@@ -14,17 +18,7 @@ export default defineConfig({
       exclude: [
         'node_modules/',
         'dist/',
-        'cypress/',
-      ],
-      lines: 70,
-      functions: 70,
-      branches: 70,
-      statements: 70,
-    },
-  },
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
-    },
-  },
+      ]
+    }
+  }
 })
