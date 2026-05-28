@@ -1,0 +1,13 @@
+{
+  "name": "Generate Documentation",
+  "version": "1.0.0",
+  "description": "Gera automaticamente documentação com IA para mudanças de código (docstrings, API docs, README)",
+  "when": {
+    "type": "postToolUse",
+    "toolTypes": "write"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Gere ou atualize documentação para as mudanças de código: 1) Docstrings em todas as funções/classes, 2) Atualize README.md se necessário, 3) Atualize documentação de API (Swagger) se endpoints mudaram, 4) Gere diagramas se arquitetura mudou. Mantenha padrão português brasileiro."
+  }
+}

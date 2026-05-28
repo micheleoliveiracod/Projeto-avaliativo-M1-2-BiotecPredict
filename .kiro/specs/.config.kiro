@@ -1,0 +1,78 @@
+{
+  "projectName": "BiotecPredict",
+  "projectDescription": "Plataforma de Manufatura Preditiva com ML e Compliance Score",
+  "specs": [
+    {
+      "name": "prompt-logging",
+      "type": "feature",
+      "status": "completed",
+      "workflowType": "requirements-first",
+      "createdAt": "2026-05-24",
+      "completedAt": "2026-05-27"
+    },
+    {
+      "name": "backend-api",
+      "type": "feature",
+      "status": "in-progress",
+      "workflowType": "requirements-first",
+      "createdAt": "2026-05-27",
+      "sprint": 1
+    },
+    {
+      "name": "frontend-dashboard",
+      "type": "feature",
+      "status": "pending",
+      "workflowType": "requirements-first",
+      "createdAt": "2026-05-27",
+      "sprint": 2
+    },
+    {
+      "name": "ml-compliance-score",
+      "type": "feature",
+      "status": "pending",
+      "workflowType": "requirements-first",
+      "createdAt": "2026-05-27",
+      "sprint": 3
+    },
+    {
+      "name": "data-validation",
+      "type": "feature",
+      "status": "pending",
+      "workflowType": "requirements-first",
+      "createdAt": "2026-05-27",
+      "sprint": 5
+    }
+  ],
+  "correctnessProperties": [
+    {
+      "id": "prop_1",
+      "name": "Data Validation",
+      "description": "Todos os dados de sensores devem estar dentro dos ranges esperados",
+      "formula": "∀ batch: ∀ sensor ∈ batch: sensor.value ∈ SENSOR_RANGES[sensor.type]"
+    },
+    {
+      "id": "prop_2",
+      "name": "Compliance Score Range",
+      "description": "Score de compliance deve estar sempre entre 0 e 100",
+      "formula": "∀ batch: 0 ≤ batch.compliance_score ≤ 100"
+    },
+    {
+      "id": "prop_3",
+      "name": "Classification Correctness",
+      "description": "Classificação deve corresponder ao score calculado",
+      "formula": "∀ batch: classify(batch.compliance_score) = batch.classification"
+    },
+    {
+      "id": "prop_4",
+      "name": "Minimum Readings",
+      "description": "Todo batch deve ter no mínimo 5 leituras de sensores",
+      "formula": "∀ batch: count(batch.sensor_readings) ≥ 5"
+    },
+    {
+      "id": "prop_5",
+      "name": "Prediction Consistency",
+      "description": "Predições de risco devem ser consistentes com dados de entrada",
+      "formula": "∀ batch: predict(batch.sensors) ∈ {LOW_RISK, MEDIUM_RISK, HIGH_RISK}"
+    }
+  ]
+}
