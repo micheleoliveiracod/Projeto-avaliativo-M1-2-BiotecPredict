@@ -1,0 +1,151 @@
+name: Análise de Velocidade
+
+on:
+  schedule:
+    - cron: '0 13 * * 1'  # Segunda-feira às 13h (Brasília - UTC-3)
+  workflow_dispatch:
+
+jobs:
+  analyze-velocity:
+    runs-on: ubuntu-latest
+    name: Analisar Velocidade do Time
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Analisar métricas de velocidade
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            // Converter para timezone de Brasília (UTC-3)
+            const now = new Date();
+            const brasiliaTz = new Date(now.toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' }));
+            const date = brasiliaTz.toISOString().split('T')[0];
+            
+            // Calcular período (últimas 4 semanas)
+            const fourWeeksAgo = new Date();
+            fourWeeksAgo.setDate(fourWeeksAgo.getDate() - 28);
+            
+            // Obter issues fechadas nas últimas 4 semanas
+            const closedIssues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'closed',
+              sort: 'updated',
+              direction: 'desc',
+              per_page: 100
+            });
+            
+            const recentClosedIssues = closedIssues.data.filter(issue => {
+              const closedDate = new Date(issue.closed_at);
+              return closedDate > fourWeeksAgo && !issue.pull_request;
+            });
+            
+            // Obter PRs mergeadas nas últimas 4 semanas
+            const mergedPRs = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'closed',
+              sort: 'updated',
+              direction: 'desc',
+              per_page: 100
+            });
+            
+            const recentMergedPRs = mergedPRs.data.filter(pr => {
+              const mergedDate = new Date(pr.merged_at);
+              return pr.merged_at && mergedDate > fourWeeksAgo;
+            });
+            
+            // Calcular velocidade por semana
+            const weeksData = [];
+            for (let i = 0; i < 4; i++) {
+              const weekStart = new Date();
+              weekStart.setDate(weekStart.getDate() - (7 * (i + 1)));
+              const weekEnd = new Date();
+              weekEnd.setDate(weekEnd.getDate() - (7 * i));
+              
+              const weekIssues = recentClosedIssues.filter(issue => {
+                const closedDate = new Date(issue.closed_at);
+                return closedDate >= weekStart && closedDate < weekEnd;
+              }).length;
+              
+              const weekPRs = recentMergedPRs.filter(pr => {
+                const mergedDate = new Date(pr.merged_at);
+                return mergedDate >= weekStart && mergedDate < weekEnd;
+              }).length;
+              
+              weeksData.push({
+                week: i + 1,
+                issues: weekIssues,
+                prs: weekPRs,
+                total: weekIssues + weekPRs
+              });
+            }
+            
+            // Calcular média
+            const avgIssuesPerWeek = (weeksData.reduce((sum, w) => sum + w.issues, 0) / 4).toFixed(2);
+            const avgPRsPerWeek = (weeksData.reduce((sum, w) => sum + w.prs, 0) / 4).toFixed(2);
+            const avgVelocity = (weeksData.reduce((sum, w) => sum + w.total, 0) / 4).toFixed(2);
+            
+            // Gerar relatório
+            let report = `# Velocity Analysis - ${date}
+
+## 📊 Team Velocity (Last 4 Weeks)
+
+### Weekly Breakdown
+`;
+            
+            weeksData.forEach(week => {
+              report += `\n**Week ${week.week}**
+- Issues Closed: ${week.issues}
+- PRs Merged: ${week.prs}
+- Total: ${week.total}
+`;
+            });
+            
+            report += `\n## 📈 Metrics
+
+### Average Velocity
+- **Issues/Week**: ${avgIssuesPerWeek}
+- **PRs/Week**: ${avgPRsPerWeek}
+- **Total/Week**: ${avgVelocity}
+
+### Trend
+`;
+            
+            // Calcular tendência
+            const week1Velocity = weeksData[3].total;
+            const week4Velocity = weeksData[0].total;
+            const trend = week4Velocity > week1Velocity ? '📈 Increasing' : week4Velocity < week1Velocity ? '📉 Decreasing' : '➡️ Stable';
+            
+            report += `- **Direction**: ${trend}
+- **Week 1 Velocity**: ${week1Velocity}
+- **Week 4 Velocity**: ${week4Velocity}
+
+## 🎯 Projections
+
+### Estimated Completion
+- **At Current Velocity**: ${(avgVelocity * 4).toFixed(0)} items/month
+- **Estimated Sprint Capacity**: ${(avgVelocity * 2).toFixed(0)} items/2 weeks
+
+### Recommendations
+${avgVelocity < 5 ? '- ⚠️ Velocity is low. Consider reviewing sprint planning.' : ''}
+${trend === '📉 Decreasing' ? '- ⚠️ Velocity is decreasing. Check for blockers or team capacity issues.' : ''}
+${trend === '📈 Increasing' ? '- ✅ Velocity is increasing. Team is performing well!' : ''}
+`;
+            
+            // Salvar relatório
+            const reportPath = `.kiro/reports/velocity-${date}.md`;
+            fs.mkdirSync('.kiro/reports', { recursive: true });
+            fs.writeFileSync(reportPath, report);
+            
+            console.log('Velocity analysis generated:', reportPath);
+      
+      - name: Fazer commit do relatório
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add .kiro/reports/velocity-*.md
+          git commit -m "docs: adiciona análise de velocidade" || true
+          git push

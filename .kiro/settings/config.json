@@ -1,0 +1,120 @@
+{
+  "projeto": {
+    "nome": "BiotecPredict",
+    "descricao": "Plataforma de Manufatura Preditiva para Biofarmacêutica",
+    "versao": "0.1.0",
+    "idioma": "pt-BR",
+    "timezone": "America/Sao_Paulo",
+    "pais": "Brasil",
+    "capital": "Brasília"
+  },
+  "configuracoes": {
+    "timezone": {
+      "padrao": "America/Sao_Paulo",
+      "utc_offset": "-03:00",
+      "descricao": "Horário de Brasília (UTC-3)"
+    },
+    "idioma": {
+      "padrao": "pt-BR",
+      "descricao": "Português Brasileiro"
+    },
+    "formato_data": "DD/MM/YYYY",
+    "formato_hora": "HH:mm:ss",
+    "formato_datetime": "DD/MM/YYYY HH:mm:ss"
+  },
+  "automacoes": {
+    "workflows": {
+      "progress_report": {
+        "nome": "Relatório de Progresso",
+        "schedule": "0 12 * * 1",
+        "descricao": "Segunda-feira às 12h (Brasília - UTC-3)",
+        "idioma": "pt-BR"
+      },
+      "velocity_analysis": {
+        "nome": "Análise de Velocidade",
+        "schedule": "0 13 * * 1",
+        "descricao": "Segunda-feira às 13h (Brasília - UTC-3)",
+        "idioma": "pt-BR"
+      },
+      "metrics_dashboard": {
+        "nome": "Dashboard de Métricas",
+        "schedule": "0 14 * * 1",
+        "descricao": "Segunda-feira às 14h (Brasília - UTC-3)",
+        "idioma": "pt-BR"
+      }
+    },
+    "hooks": {
+      "prompt_logger": {
+        "nome": "Registrador de Prompts",
+        "evento": "promptSubmit",
+        "descricao": "Registra automaticamente prompts executados no Kiro",
+        "idioma": "pt-BR"
+      }
+    }
+  },
+  "documentacao": {
+    "idioma": "pt-BR",
+    "timezone": "America/Sao_Paulo",
+    "formato_data": "DD de MMMM de YYYY",
+    "formato_hora": "HH:mm:ss (Brasília - UTC-3)"
+  },
+  "github": {
+    "templates": {
+      "issues": {
+        "idioma": "pt-BR",
+        "tipos": [
+          "🐛 Relatório de Bug",
+          "🚀 Solicitação de Funcionalidade",
+          "📚 Documentação",
+          "🔧 Manutenção",
+          "💬 Questão Geral"
+        ]
+      },
+      "pull_requests": {
+        "idioma": "pt-BR",
+        "secoes": [
+          "Contexto",
+          "O que foi feito",
+          "Como testar",
+          "Dependências",
+          "Referências",
+          "Checklist"
+        ]
+      }
+    },
+    "commits": {
+      "convencao": "Conventional Commits",
+      "idioma": "pt-BR",
+      "tipos": [
+        "feat: nova funcionalidade",
+        "fix: correção de bug",
+        "docs: documentação",
+        "chore: manutenção",
+        "refactor: refatoração",
+        "test: testes",
+        "style: formatação",
+        "perf: performance",
+        "ci: CI/CD"
+      ]
+    },
+    "branches": {
+      "convencao": "GitFlow",
+      "idioma": "pt-BR",
+      "tipos": [
+        "feature/nome-da-funcionalidade",
+        "bugfix/descricao-do-ajuste",
+        "hotfix/descricao-do-problema",
+        "release/vX.Y.Z",
+        "chore/descricao-da-tarefa",
+        "docs/descricao-da-documentacao"
+      ]
+    }
+  },
+  "relatorios": {
+    "idioma": "pt-BR",
+    "timezone": "America/Sao_Paulo",
+    "formato_data": "DD/MM/YYYY",
+    "formato_hora": "HH:mm:ss",
+    "diretorio": ".kiro/reports"
+  }
+}

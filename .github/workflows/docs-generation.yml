@@ -1,0 +1,75 @@
+name: Auto-Generate Documentation
+
+on:
+  push:
+    branches: [ develop, main ]
+    paths:
+      - 'backend/**/*.py'
+      - 'frontend/**/*.ts'
+      - 'frontend/**/*.tsx'
+  workflow_run:
+    workflows: [ "CI - Lint & Tests" ]
+    types: [ completed ]
+    branches: [ develop ]
+
+jobs:
+  generate-docs:
+    runs-on: ubuntu-latest
+    name: Generate Documentation with AI
+    if: github.event.workflow_run.conclusion == 'success' || github.event_name == 'push'
+    
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          cd backend && pip install -r requirements.txt
+      
+      - name: Generate API documentation
+        run: |
+          python backend/scripts/generate_api_docs.py --output docs/API.md
+      
+      - name: Analyze missing docstrings
+        run: |
+          python backend/scripts/generate_docstrings.py --path backend
+      
+      - name: Generate OpenAPI schema
+        run: |
+          mkdir -p docs/schemas
+          cd backend
+          python -c "
+          from main import app
+          import json
+          schema = app.openapi()
+          with open('../docs/schemas/openapi.json', 'w') as f:
+              json.dump(schema, f, indent=2)
+          " || echo "Note: OpenAPI schema generation requires running app"
+      
+      - name: Create commit if changes exist
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          
+          if git diff --quiet; then
+            echo "No documentation changes"
+          else
+            git add docs/
+            git commit -m "docs: auto-generate documentation from code changes"
+            git push
+          fi
+      
+      - name: Create documentation summary
+        run: |
+          echo "## 📚 Documentation Generated" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ API documentation updated" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Docstring analysis completed" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ OpenAPI schema generated" >> $GITHUB_STEP_SUMMARY

@@ -1,0 +1,98 @@
+name: E2E Tests - Cypress
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths-ignore:
+      - 'docs/**'
+      - '.kiro/steering/**'
+      - '.github/issue_template/**'
+      - '*.md'
+  pull_request:
+    branches: [ main, develop ]
+    types: [ opened, synchronize, reopened ]
+    paths-ignore:
+      - 'docs/**'
+      - '.kiro/steering/**'
+      - '.github/issue_template/**'
+      - '*.md'
+  schedule:
+    - cron: '0 2 * * *'  # Run daily at 2 AM UTC (disabled for now)
+
+jobs:
+  e2e-tests:
+    runs-on: ubuntu-latest
+    name: E2E Tests (Cypress)
+    
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: biotech_user
+          POSTGRES_PASSWORD: biotech_password
+          POSTGRES_DB: biotecpredict
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+      
+      - name: Install backend dependencies
+        run: |
+          python -m pip install --upgrade pip
+          cd backend && pip install -r requirements.txt
+      
+      - name: Install frontend dependencies
+        run: |
+          cd frontend
+          npm ci
+      
+      - name: Start backend server
+        run: |
+          cd backend
+          python -m uvicorn main:app --host 0.0.0.0 --port 8000 &
+          sleep 5
+        env:
+          DATABASE_URL: postgresql://biotech_user:biotech_password@localhost:5432/biotecpredict
+      
+      - name: Start frontend dev server
+        run: |
+          cd frontend
+          npm run dev &
+          sleep 10
+      
+      - name: Run Cypress E2E tests
+        run: |
+          cd frontend
+          npm run test:e2e
+      
+      - name: Upload Cypress screenshots
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: cypress-screenshots
+          path: frontend/cypress/screenshots
+      
+      - name: Upload Cypress videos
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: cypress-videos
+          path: frontend/cypress/videos
