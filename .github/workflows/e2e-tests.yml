@@ -1,23 +1,12 @@
 name: E2E Tests - Cypress
 
+# DESABILITADO PARA FASE 0 - Será ativado em Sprint 2 (frontend-e2e-tests) e Sprint 4 (cypress-e2e-tests)
+# Este workflow NÃO deve rodar em Fase 0 (Sprint 0)
+# Configurado para rodar APENAS manualmente via workflow_dispatch
 on:
-  push:
-    branches: [ main, develop ]
-    paths-ignore:
-      - 'docs/**'
-      - '.kiro/steering/**'
-      - '.github/issue_template/**'
-      - '*.md'
-  pull_request:
-    branches: [ main, develop ]
-    types: [ opened, synchronize, reopened ]
-    paths-ignore:
-      - 'docs/**'
-      - '.kiro/steering/**'
-      - '.github/issue_template/**'
-      - '*.md'
+  workflow_dispatch:  # Apenas manual para testes
   schedule:
-    - cron: '0 2 * * *'  # Run daily at 2 AM UTC (disabled for now)
+    - cron: '0 2 * * 0'  # Nunca roda (domingo às 2 AM UTC)
 
 jobs:
   e2e-tests:
