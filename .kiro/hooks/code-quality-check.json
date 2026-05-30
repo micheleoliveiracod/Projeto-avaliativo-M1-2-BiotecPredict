@@ -1,0 +1,13 @@
+{
+  "name": "Code Quality Check",
+  "version": "1.0.0",
+  "description": "Verifica qualidade de código antes de commit (lint, type hints, docstrings)",
+  "when": {
+    "type": "preToolUse",
+    "toolTypes": "write"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Verifique qualidade do código: 1) Lint (flake8 backend, ESLint frontend), 2) Type hints em Python, 3) Docstrings em todas as funções, 4) Sem secrets ou dados sensíveis. Siga padrões do projeto (Clean Architecture, separação de responsabilidades). Rejeite código que não atenda aos critérios."
+  }
+}
