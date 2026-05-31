@@ -1,0 +1,21 @@
+project:
+  name: BiotecPredict
+  description: Sistema de Predição e Conformidade para Biotecnologia
+  version: 1.0.0
+
+automation:
+  enabled: true
+  log_prompts: true
+  log_directory: .kiro/logs
+
+ci_cd:
+  enabled: true
+  run_tests_on_pr: true
+  run_linting: true
+
+specs:
+  directory: .kiro/specs
+  default_workflow: requirements-first
+
+steering:
+  directory: .kiro/steering
