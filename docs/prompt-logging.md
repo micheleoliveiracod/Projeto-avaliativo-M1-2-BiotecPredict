@@ -1732,15 +1732,26 @@ Use este checklist para diagnosticar problemas:
 
 Este sistema de prompt logging possui algumas limitações técnicas que você deve estar ciente. Estas limitações são documentadas para ajudar no uso efetivo do sistema e no planejamento de melhorias futuras.
 
-### 1. Captura de Conteúdo do Prompt
+### 1. ❌ Captura de Conteúdo do Prompt (VALIDADO - 31/05/2026)
 
-**Limitação:** O Kiro pode não expor o conteúdo completo do prompt via variáveis de ambiente ou stdin no contexto do hook `promptSubmit`.
+**Limitação:** O Kiro **NÃO expõe o conteúdo do prompt** via variáveis de ambiente, stdin ou argumentos de linha de comando no contexto do hook `promptSubmit`.
 
-**Causa Técnica:** O hook `promptSubmit` é acionado pelo Kiro, mas pode não ter acesso direto ao conteúdo do prompt que foi submetido. Isso depende da implementação interna do Kiro e de como os hooks são executados.
+**Validação Técnica (Testes Realizados):**
+- ❌ stdin: É um terminal interativo (TTY), sem dados disponíveis
+- ❌ Variáveis de ambiente: `KIRO_PROMPT` e `USER_PROMPT` não estão disponíveis
+- ❌ Argumentos CLI: Script executado sem argumentos
+- ❌ Contexto do hook: Nenhuma variável Kiro específica disponível
+- ✅ File descriptors: Disponíveis, mas sem dados do prompt
+
+**Causa Técnica:** 
+- O hook `promptSubmit` é acionado pelo Kiro, mas é executado em contexto isolado
+- stdin é um terminal interativo, não um pipe com dados
+- O Kiro não passa o conteúdo do prompt ao script do hook
+- Isso é uma limitação da implementação atual do Kiro, não do script de logging
 
 **Impacto:** 
-- Logs podem conter apenas metadados (branch, usuário, timestamp) sem o conteúdo real do prompt
-- Arquivo de log terá a seção "Prompt original" vazia ou com placeholder
+- Logs contêm apenas metadados (branch, usuário, timestamp) sem o conteúdo real do prompt
+- Arquivo de log terá a seção "Prompt original" com placeholder
 - Reduz a utilidade dos logs para rastreabilidade completa
 
 **Exemplo de Impacto:**
@@ -1752,7 +1763,7 @@ Este sistema de prompt logging possui algumas limitações técnicas que você d
 
 ### Prompt original
 ```
-[Conteúdo do prompt não capturado automaticamente]
+[Conteúdo do prompt não capturado automaticamente - limitação do Kiro]
 ```
 ```
 
@@ -1762,9 +1773,16 @@ Este sistema de prompt logging possui algumas limitações técnicas que você d
 3. **Usar comentários:** Adicionar comentários no código referenciando o prompt
 4. **Consultar histórico:** Verificar o histórico do Kiro para recuperar o prompt
 
-**Validação:** Este sistema foi testado para confirmar se a captura de conteúdo funciona. Consulte a seção "Testes de Captura de Conteúdo" em Troubleshooting para resultados.
+**Testes Realizados:**
+- Script: `.kiro/scripts/test_stdin_availability.py`
+- Relatório: `.kiro/reports/stdin_availability_report.md`
+- Análise: `.kiro/reports/stdin_analysis_and_recommendations.md`
+- Documentação: `.kiro/reports/CAPTURE_TESTS_DOCUMENTATION.md`
 
-**Mitigação Planejada:** Fase 2 pode incluir integração mais profunda com o Kiro para melhorar a captura de conteúdo.
+**Mitigação Planejada:** 
+- Solicitar ao Kiro que exponha conteúdo do prompt via variável de ambiente
+- Implementar captura via clipboard como alternativa
+- Fase 2 pode incluir integração mais profunda com o Kiro
 
 ---
 
