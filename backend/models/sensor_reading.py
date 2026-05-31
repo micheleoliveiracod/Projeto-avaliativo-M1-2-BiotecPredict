@@ -14,7 +14,7 @@ Campos:
 from sqlalchemy import Column, Integer, Float, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 from datetime import datetime
-from .batch import Base
+from backend.db.database import Base
 
 
 class SensorReading(Base):

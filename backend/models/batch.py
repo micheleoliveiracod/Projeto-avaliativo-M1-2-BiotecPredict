@@ -10,11 +10,9 @@ Campos:
 """
 
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, DateTime, Float, Enum
+from sqlalchemy import Column, Integer, String, DateTime, Float
 from sqlalchemy.orm import relationship
-from sqlalchemy.ext.declarative import declarative_base
-
-Base = declarative_base()
+from backend.db.database import Base
 
 
 class Batch(Base):
