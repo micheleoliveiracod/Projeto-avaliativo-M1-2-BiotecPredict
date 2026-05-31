@@ -12,8 +12,8 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
 from fastapi.testclient import TestClient
-from backend.models import Base, Batch, SensorReading
-from backend.db.database import get_db
+from backend.models import Batch, SensorReading
+from backend.db.database import Base, get_db
 from backend.api.main import app
 from datetime import datetime
 
