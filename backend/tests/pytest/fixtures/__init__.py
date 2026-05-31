@@ -1,0 +1,1 @@
+# Fixtures customizadas do BiotecPredict
