@@ -648,26 +648,170 @@ Ao trabalhar com prompt logging, seguir estas práticas:
 
 ---
 
-## ⚠️ Limitações Conhecidas
+## ⚠️ Limitações Conhecidas (Validadas em 31/05/2026)
 
-### 1. Captura de Conteúdo
-- Kiro pode não expor conteúdo completo via hooks
-- Prompts sem conteúdo são automaticamente filtrados
-- Metadados ainda são registrados mesmo sem conteúdo
+### 1. ❌ stdin NÃO está disponível no contexto do hook (VALIDADO)
 
-### 2. Filtragem Automática
+**Status**: ✅ Testado e confirmado
+
+**Detalhes**:
+- stdin é um terminal interativo (TTY), não um pipe com dados
+- Não há dados disponíveis para leitura de stdin
+- O hook é executado em contexto de terminal, não em contexto de pipe
+
+**Implicação**: 
+- Conteúdo do prompt **NÃO é capturado automaticamente** via stdin
+- Apenas metadados (branch, usuário, timestamp) são registrados
+- Placeholder é usado para conteúdo do prompt
+
+**Teste realizado**: `.kiro/scripts/test_stdin_availability.py`  
+**Relatório**: `.kiro/reports/stdin_availability_report.md`
+
+---
+
+### 2. ❌ Variáveis de ambiente Kiro NÃO são passadas (VALIDADO)
+
+**Status**: ✅ Testado e confirmado
+
+**Detalhes**:
+- Variáveis `KIRO_PROMPT`, `USER_PROMPT` não estão disponíveis
+- Nenhuma variável Kiro específica (`KIRO_HOOK_TYPE`, `KIRO_EVENT_TYPE`, etc) é passada
+- Hook é executado em contexto isolado sem metadados do Kiro
+
+**Implicação**:
+- Conteúdo do prompt **NÃO pode ser capturado** via variáveis de ambiente
+- Script não tem acesso ao contexto do Kiro
+
+**Teste realizado**: `.kiro/scripts/test_stdin_availability.py`  
+**Relatório**: `.kiro/reports/stdin_availability_report.md`
+
+---
+
+### 3. ❌ Argumentos de linha de comando NÃO estão disponíveis (VALIDADO)
+
+**Status**: ✅ Testado e confirmado
+
+**Detalhes**:
+- Script é executado sem argumentos de linha de comando
+- Kiro não passa conteúdo do prompt como argumentos
+- `sys.argv` contém apenas o nome do script
+
+**Implicação**:
+- Conteúdo do prompt **NÃO pode ser capturado** via argumentos CLI
+- Script não recebe parâmetros do Kiro
+
+**Teste realizado**: `.kiro/scripts/test_stdin_availability.py`  
+**Relatório**: `.kiro/reports/stdin_availability_report.md`
+
+---
+
+### 4. ✅ File descriptors estão disponíveis (VALIDADO)
+
+**Status**: ✅ Testado e confirmado
+
+**Detalhes**:
+- stdin (0), stdout (1), stderr (2) estão disponíveis
+- Script pode ler de stdin, escrever em stdout e stderr
+- No entanto, stdin é um terminal interativo, não um pipe com dados
+
+**Implicação**:
+- File descriptors funcionam, mas **sem dados do prompt**
+- Script pode registrar logs e erros normalmente
+
+**Teste realizado**: `.kiro/scripts/test_stdin_availability.py`  
+**Relatório**: `.kiro/reports/stdin_availability_report.md`
+
+---
+
+### 5. Filtragem Automática
 - Confirmações simples não são registradas
 - Respostas muito curtas são filtradas
 - Comandos de navegação são ignorados
 
-### 3. Sem Captura de Resultados (MVP)
+### 6. Sem Captura de Resultados (MVP)
 - Apenas prompts são capturados, não respostas do agente
 - Planejado para fase futura (hook `agentStop`)
 
-### 4. Crescimento de Arquivos
+### 7. Crescimento de Arquivos
 - Arquivos de log crescem indefinidamente
 - Estratégia de rotação planejada para fase futura
 - Considerar arquivamento manual se necessário
+
+---
+
+## 📊 Matriz de Estratégias de Captura (Validada)
+
+| Estratégia | Status | Razão | Alternativa |
+|---|---|---|---|
+| **stdin** | ❌ Não funciona | TTY sem dados disponíveis | Aguardar melhoria no Kiro |
+| **Variáveis de ambiente** | ❌ Não funciona | Kiro não passa `KIRO_PROMPT` | Solicitar ao Kiro |
+| **Argumentos CLI** | ❌ Não funciona | Script executado sem argumentos | Solicitar ao Kiro |
+| **Contexto do hook** | ❌ Não funciona | Hook isolado, sem metadados | Solicitar ao Kiro |
+| **File descriptors** | ✅ Disponível | stdin, stdout, stderr funcionam | Usar atualmente |
+| **Placeholder** | ✅ Funciona | Fallback para conteúdo | Usar atualmente |
+
+---
+
+## 💡 Recomendações (Baseadas em Testes)
+
+### Recomendação 1: Manter Implementação Atual (Curto Prazo) ✅
+
+**Status**: Implementado
+
+**Ação**: Manter script de logging com placeholder para conteúdo do prompt.
+
+**Justificativa**:
+- Funciona com contexto atual do Kiro
+- Registra metadados importantes (branch, usuário, timestamp)
+- Não bloqueia execução do Kiro
+- Pode ser melhorado quando Kiro expor conteúdo do prompt
+
+**Implementação**: Já está implementado em `log_prompt.py`
+
+---
+
+### Recomendação 2: Documentar Limitação (Imediato) ✅
+
+**Status**: Implementado
+
+**Ação**: Documentar que stdin não está disponível e conteúdo do prompt não é capturado automaticamente.
+
+**Justificativa**:
+- Transparência com usuários
+- Evita expectativas incorretas
+- Facilita futuras melhorias
+
+**Implementação**: Documentado neste arquivo e em `docs/prompt-logging.md`
+
+---
+
+### Recomendação 3: Solicitar Melhoria ao Kiro (Médio Prazo) ⏳
+
+**Status**: Pendente
+
+**Ação**: Solicitar ao Kiro que exponha conteúdo do prompt via variável de ambiente.
+
+**Justificativa**:
+- Permitiria captura automática de conteúdo
+- Melhoraria rastreabilidade de prompts
+- Beneficiaria outros hooks e scripts
+
+**Implementação**: Criar issue no repositório do Kiro
+
+---
+
+### Recomendação 4: Implementar Captura via Clipboard (Futuro) ⏳
+
+**Status**: Planejado
+
+**Ação**: Implementar estratégia alternativa de captura via clipboard.
+
+**Justificativa**:
+- Funciona sem mudanças no Kiro
+- Automático para usuário
+- Funciona em Windows, Mac e Linux
+
+**Implementação**: Adicionar função `get_prompt_from_clipboard()` em `log_prompt.py`
 
 ---
 
