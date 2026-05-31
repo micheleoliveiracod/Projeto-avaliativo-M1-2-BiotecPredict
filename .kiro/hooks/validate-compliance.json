@@ -1,0 +1,13 @@
+{
+  "name": "Validate Compliance Score",
+  "version": "1.0.0",
+  "description": "Valida cálculos de compliance score (regras determinísticas, ranges, classificação)",
+  "when": {
+    "type": "postToolUse",
+    "toolTypes": ".*compliance.*|.*score.*"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Valide o cálculo de compliance score: 1) Verificar se score está entre 0-100, 2) Validar classificação (ACCEPTABLE 80-100, WARNING 60-79, CRITICAL 0-59), 3) Verificar se regras foram aplicadas corretamente, 4) Registrar valores de entrada nos logs para auditoria. Rejeite scores inválidos com mensagem clara."
+  }
+}

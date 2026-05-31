@@ -1,0 +1,13 @@
+{
+  "name": "Generate Tests with AI",
+  "version": "1.0.0",
+  "description": "Gera automaticamente testes com IA para código novo (pytest backend, Vitest frontend)",
+  "when": {
+    "type": "postToolUse",
+    "toolTypes": "write"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Gere testes abrangentes para as mudanças de código: 1) Testes unitários (pytest/Vitest), 2) Testes de edge cases, 3) Testes de integração se aplicável, 4) Testes E2E para fluxos de usuário. Cobertura mínima: 70%. Siga padrões do projeto (backend: pytest, frontend: Vitest)."
+  }
+}
