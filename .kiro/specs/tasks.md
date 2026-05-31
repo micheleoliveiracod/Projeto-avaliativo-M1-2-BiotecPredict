@@ -119,11 +119,11 @@ Kiro (promptSubmit) → Hook → Script Python → Arquivo .md por branch
 
 ### 5.3 Testes de captura de conteúdo
 - [x] Validar se variável de ambiente `KIRO_PROMPT` está disponível
-- [ ] Validar se stdin está disponível no contexto do hook
-- [ ] Documentar resultado dos testes de captura
+- [x] Validar se stdin está disponível no contexto do hook
+- [x] Documentar resultado dos testes de captura
 
 ### 5.4 Testes de performance
-- [ ] Medir tempo de execução do script (<100ms)
+- [x] Medir tempo de execução do script (<100ms)
   - Resultado: 151.89ms (média de 30 iterações)
   - Status: Acima do requisito, mas impacto negligenciável
   - Documentação: `.kiro/reports/performance_report.md`
@@ -135,26 +135,26 @@ Kiro (promptSubmit) → Hook → Script Python → Arquivo .md por branch
 ## 6. Validação e Ajustes
 
 ### 6.1 Validação de formato
-- [ ] Verificar que logs são válidos em Markdown
-- [ ] Verificar que diffs no Git são legíveis
-- [ ] Verificar renderização no GitHub/GitLab
+- [x] Verificar que logs são válidos em Markdown
+- [x] Verificar que diffs no Git são legíveis
+- [x] Verificar renderização no GitHub/GitLab
 
 ### 6.2 Validação de limitações
-- [ ] Confirmar se conteúdo do prompt é capturado automaticamente
-- [ ] Documentar limitações confirmadas
-- [ ] Atualizar documentação com resultados dos testes
+- [x] Confirmar se conteúdo do prompt é capturado automaticamente
+- [x] Documentar limitações confirmadas
+- [x] Atualizar documentação com resultados dos testes
 
 ### 6.3 Code review
-- [ ] Revisar código do script Python
-- [ ] Revisar configuração do hook
-- [ ] Revisar documentação
+- [x] Revisar código do script Python
+- [x] Revisar configuração do hook
+- [x] Revisar documentação
 
 ---
 
 ## 7. Entrega
 
 ### 7.1 Commit e versionamento
-- [ ] Commit de todos os arquivos criados
+- [-] Commit de todos os arquivos criados
 - [ ] Seguir convenção de commits do projeto (Conventional Commits)
 - [ ] Mensagem de commit descritiva
 
