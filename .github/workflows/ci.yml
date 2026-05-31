@@ -1,48 +1,24 @@
 name: CI - Lint & Tests
 
 on:
-  pull_request_review:
-    types: [ submitted ]
-    branches: [ develop, main ]
-  pull_request:
-    types: [ synchronize ]
-    branches: [ develop, main ]
+  push:
+    branches: [ develop ]
     paths-ignore:
       - 'docs/**'
       - '.kiro/steering/**'
       - '.github/issue_template/**'
       - '*.md'
 
-# Filtro: Apenas dispara para PRs de feature/* e bugfix/*
+# Concorrência: Apenas uma execução por branch
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  validate-branch:
-    runs-on: ubuntu-latest
-    name: Validate Branch Type
-    outputs:
-      should-run: ${{ steps.check.outputs.should-run }}
-    
-    steps:
-      - name: Check if branch is feature/* or bugfix/*
-        id: check
-        run: |
-          BRANCH_NAME="${{ github.head_ref }}"
-          if [[ $BRANCH_NAME == feature/* ]] || [[ $BRANCH_NAME == bugfix/* ]]; then
-            echo "should-run=true" >> $GITHUB_OUTPUT
-            echo "✅ Branch $BRANCH_NAME qualifies for CI/CD"
-          else
-            echo "should-run=false" >> $GITHUB_OUTPUT
-            echo "⏭️  Branch $BRANCH_NAME skipped (not feature/* or bugfix/*)"
-          fi
 
   backend-lint:
     runs-on: ubuntu-latest
     name: Backend - Lint (flake8)
-    needs: validate-branch
-    if: needs.validate-branch.outputs.should-run == 'true'
     
     steps:
       - uses: actions/checkout@v3
@@ -77,8 +53,6 @@ jobs:
   backend-tests:
     runs-on: ubuntu-latest
     name: Backend - Unit Tests (pytest)
-    needs: validate-branch
-    if: needs.validate-branch.outputs.should-run == 'true'
     
     services:
       postgres:
@@ -126,8 +100,6 @@ jobs:
   frontend-lint:
     runs-on: ubuntu-latest
     name: Frontend - Lint (ESLint)
-    needs: validate-branch
-    if: needs.validate-branch.outputs.should-run == 'true'
     
     steps:
       - uses: actions/checkout@v3
@@ -152,8 +124,6 @@ jobs:
   frontend-tests:
     runs-on: ubuntu-latest
     name: Frontend - Unit Tests (Vitest)
-    needs: validate-branch
-    if: needs.validate-branch.outputs.should-run == 'true'
     
     steps:
       - uses: actions/checkout@v3
@@ -185,8 +155,6 @@ jobs:
   api-integration-tests:
     runs-on: ubuntu-latest
     name: API - Integration Tests (Postman/Newman)
-    needs: validate-branch
-    if: needs.validate-branch.outputs.should-run == 'true'
     
     services:
       postgres:
@@ -242,8 +210,8 @@ jobs:
   build-status:
     runs-on: ubuntu-latest
     name: Build Status Check
-    needs: [validate-branch, backend-lint, backend-tests, frontend-lint, frontend-tests, api-integration-tests]
-    if: always() && needs.validate-branch.outputs.should-run == 'true'
+    needs: [backend-lint, backend-tests, frontend-lint, frontend-tests, api-integration-tests]
+    if: always()
     
     steps:
       - name: Check build status
