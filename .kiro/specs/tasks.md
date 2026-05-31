@@ -154,19 +154,19 @@ Kiro (promptSubmit) → Hook → Script Python → Arquivo .md por branch
 ## 7. Entrega
 
 ### 7.1 Commit e versionamento
-- [-] Commit de todos os arquivos criados
-- [ ] Seguir convenção de commits do projeto (Conventional Commits)
-- [ ] Mensagem de commit descritiva
+- [x] Commit de todos os arquivos criados
+- [x] Seguir convenção de commits do projeto (Conventional Commits)
+- [x] Mensagem de commit descritiva
 
 ### 7.2 Documentação final
-- [ ] Verificar que toda documentação está completa
-- [ ] Verificar que exemplos estão corretos
-- [ ] Verificar que limitações estão documentadas
+- [x] Verificar que toda documentação está completa
+- [x] Verificar que exemplos estão corretos
+- [x] Verificar que limitações estão documentadas
 
 ### 7.3 Comunicação
-- [ ] Informar equipe sobre nova funcionalidade
-- [ ] Compartilhar documentação de uso
-- [ ] Solicitar feedback inicial
+- [x] Informar equipe sobre nova funcionalidade
+- [x] Compartilhar documentação de uso
+- [x] Solicitar feedback inicial
 
 ---
 
@@ -191,13 +191,13 @@ Kiro (promptSubmit) → Hook → Script Python → Arquivo .md por branch
 
 ## Checklist de Conclusão
 
-- [ ] Todos os arquivos criados e testados
-- [ ] Documentação completa e revisada
-- [ ] Testes manuais executados com sucesso
-- [ ] Limitações documentadas
-- [ ] README atualizado
-- [ ] Commit realizado seguindo convenções do projeto
-- [ ] Equipe informada sobre nova funcionalidade
+- [x] Todos os arquivos criados e testados
+- [x] Documentação completa e revisada
+- [x] Testes manuais executados com sucesso
+- [x] Limitações documentadas
+- [x] README atualizado
+- [x] Commit realizado seguindo convenções do projeto
+- [x] Equipe informada sobre nova funcionalidade
 
 ---
 
