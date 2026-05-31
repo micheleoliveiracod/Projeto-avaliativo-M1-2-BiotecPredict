@@ -1,0 +1,12 @@
+{
+  "name": "Generate Quality Reports",
+  "version": "1.0.0",
+  "description": "Gera automaticamente relatórios de qualidade de dados e compliance",
+  "when": {
+    "type": "agentStop"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Gere relatórios de qualidade: 1) Relatório de validação de dados (ranges, outliers, anomalias), 2) Relatório de compliance score (valores calculados, classificações), 3) Rastreabilidade completa (data/hora, usuário, branch), 4) Salve em backend/reports/ com versionamento. Formato: markdown com timestamp Brasília."
+  }
+}
