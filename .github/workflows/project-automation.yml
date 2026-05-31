@@ -11,110 +11,31 @@ jobs:
     name: Add Issue/PR to Project
     runs-on: ubuntu-latest
     steps:
-      - name: Add to project using GitHub Script
-        uses: actions/github-script@v7
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Add to project
+        uses: actions/add-to-project@v0.5.0
         with:
-          script: |
-            const owner = context.repo.owner;
-            const repo = context.repo.repo;
-            const item = context.payload.pull_request || context.payload.issue;
-            
-            if (!item) {
-              console.log('❌ Nenhuma PR ou issue encontrada');
-              return;
-            }
-            
-            console.log(`📌 Processando: ${item.number} - ${item.title}`);
-            console.log(`🔗 URL: ${item.html_url}`);
-            
-            try {
-              // Estratégia 1: Buscar ProjectV2 via GraphQL
-              console.log('🔍 Buscando ProjectV2 #7...');
-              
-              const query = `
-                query {
-                  user(login: "${owner}") {
-                    projectsV2(first: 20) {
-                      nodes {
-                        id
-                        number
-                        title
-                      }
-                    }
-                  }
-                }
-              `;
-              
-              const result = await github.graphql(query);
-              console.log(`📊 Projetos encontrados: ${result.user.projectsV2.nodes.length}`);
-              
-              const projectV2 = result.user.projectsV2.nodes.find(p => p.number === 7);
-              
-              if (!projectV2) {
-                console.log('❌ ProjectV2 #7 não encontrado');
-                console.log('Projetos disponíveis:');
-                result.user.projectsV2.nodes.forEach(p => {
-                  console.log(`  - ${p.title} (#${p.number})`);
-                });
-                return;
-              }
-              
-              console.log(`✅ ProjectV2 encontrado: ${projectV2.title}`);
-              console.log(`   ID: ${projectV2.id}`);
-              
-              // Adicionar item ao projeto
-              console.log('➕ Adicionando item ao projeto...');
-              
-              const addItemMutation = `
-                mutation {
-                  addProjectV2ItemById(input: {projectId: "${projectV2.id}", contentId: "${item.node_id}"}) {
-                    item {
-                      id
-                    }
-                  }
-                }
-              `;
-              
-              const addResult = await github.graphql(addItemMutation);
-              console.log(`✅ Item adicionado com sucesso!`);
-              console.log(`   Item ID: ${addResult.addProjectV2ItemById.item.id}`);
-              
-            } catch (error) {
-              console.log(`❌ Erro: ${error.message}`);
-              
-              if (error.message.includes('Could not resolve to a ProjectV2')) {
-                console.log('⚠️ Erro: ProjectV2 não pode ser resolvido');
-                console.log('💡 Possíveis causas:');
-                console.log('   1. Projeto #7 não existe');
-                console.log('   2. Projeto não é acessível com o token atual');
-                console.log('   3. Projeto foi deletado ou renomeado');
-              }
-              
-              throw error;
-            }
+          project-url: https://github.com/users/micheleoliveiracod/projects/7
+          github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
 
   update-project-status:
     name: Update Project Status
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
     steps:
-      - name: Log PR Status
+      - name: Update status based on PR state
         uses: actions/github-script@v7
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const pr = context.payload.pull_request;
             
-            console.log(`📋 PR #${pr.number}: ${pr.state}`);
-            console.log(`   Título: ${pr.title}`);
-            console.log(`   Branch: ${pr.head.ref}`);
-            console.log(`   Draft: ${pr.draft}`);
-            
-            if (pr.state === 'open' && pr.draft === false) {
-              console.log('✅ PR está pronta para revisão');
-            } else if (pr.draft) {
-              console.log('📝 PR está em rascunho');
+            if (pr) {
+              console.log(`📋 PR #${pr.number}: ${pr.state}`);
+              if (pr.state === 'open' && pr.draft === false) {
+                console.log('✅ PR está pronta para revisão');
+              } else if (pr.draft) {
+                console.log('📝 PR está em rascunho');
+              }
             }
 
   sync-milestones:
@@ -122,15 +43,15 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request' || github.event_name == 'issues'
     steps:
-      - name: Log Milestone Info
+      - name: Sync milestone
         uses: actions/github-script@v7
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const item = context.payload.pull_request || context.payload.issue;
             
             if (item && item.milestone) {
-              console.log(`✅ Milestone: ${item.milestone.title}`);
-              console.log(`   Descrição: ${item.milestone.description || 'N/A'}`);
+              console.log(`✅ Sincronizando milestone: ${item.milestone.title}`);
             } else {
               console.log(`ℹ️ Nenhum milestone associado`);
             }
