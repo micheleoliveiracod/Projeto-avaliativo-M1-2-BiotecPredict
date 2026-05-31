@@ -8,13 +8,19 @@ Fornece:
 - test_sensor_readings: Leituras de sensores de teste
 """
 
+import sys
+import os
+
+# Adicionar backend ao path
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
+
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
 from fastapi.testclient import TestClient
 from backend.models import Batch, SensorReading
 from backend.db.database import Base, get_db
-from backend.api.main import app
+from backend.main import app
 from datetime import datetime
 
 
