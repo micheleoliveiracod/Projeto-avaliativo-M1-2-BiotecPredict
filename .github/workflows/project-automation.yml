@@ -11,10 +11,11 @@ jobs:
     name: Add Issue/PR to Project
     runs-on: ubuntu-latest
     steps:
-      - name: Add to project using REST API
+      - name: Add to project using GitHub Script
         uses: actions/github-script@v7
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const owner = context.repo.owner;
             const repo = context.repo.repo;
@@ -25,83 +26,73 @@ jobs:
               return;
             }
             
-            console.log(`📌 Processando: ${item.number} (${item.title})`);
+            console.log(`📌 Processando: ${item.number} - ${item.title}`);
+            console.log(`🔗 URL: ${item.html_url}`);
             
             try {
-              // Buscar todos os projetos do usuário
-              const projectsResponse = await github.rest.projects.listForUser({
-                username: owner,
-                state: 'open'
-              });
+              // Estratégia 1: Buscar ProjectV2 via GraphQL
+              console.log('🔍 Buscando ProjectV2 #7...');
               
-              console.log(`📊 Projetos encontrados: ${projectsResponse.data.length}`);
-              
-              // Procurar pelo projeto BiotecPredict
-              const project = projectsResponse.data.find(p => 
-                p.name === 'BiotecPredict' || p.number === 7
-              );
-              
-              if (!project) {
-                console.log('❌ Projeto BiotecPredict não encontrado');
-                console.log('Projetos disponíveis:', projectsResponse.data.map(p => `${p.name} (#${p.number})`).join(', '));
-                return;
-              }
-              
-              console.log(`✅ Projeto encontrado: ${project.name} (ID: ${project.id})`);
-              
-              // Criar card no projeto
-              const cardResponse = await github.rest.projects.createCard({
-                column_id: project.columns_url.split('/').pop(), // Usar primeira coluna
-                note: `${item.title}\n\n${item.html_url}`
-              });
-              
-              console.log(`✅ Card criado com sucesso: ${cardResponse.data.id}`);
-              
-            } catch (error) {
-              console.log(`⚠️ Erro ao adicionar ao projeto: ${error.message}`);
-              
-              // Tentar abordagem alternativa com GraphQL
-              console.log('🔄 Tentando abordagem alternativa com GraphQL...');
-              
-              try {
-                const query = `
-                  query {
-                    user(login: "${owner}") {
-                      projectsV2(first: 10) {
-                        nodes {
-                          id
-                          number
-                          title
-                        }
+              const query = `
+                query {
+                  user(login: "${owner}") {
+                    projectsV2(first: 20) {
+                      nodes {
+                        id
+                        number
+                        title
                       }
                     }
                   }
-                `;
-                
-                const result = await github.graphql(query);
-                const projectV2 = result.user.projectsV2.nodes.find(p => p.number === 7);
-                
-                if (projectV2) {
-                  console.log(`✅ ProjectV2 encontrado: ${projectV2.title} (ID: ${projectV2.id})`);
-                  
-                  const addItemMutation = `
-                    mutation {
-                      addProjectV2ItemById(input: {projectId: "${projectV2.id}", contentId: "${item.node_id}"}) {
-                        item {
-                          id
-                        }
-                      }
-                    }
-                  `;
-                  
-                  const addResult = await github.graphql(addItemMutation);
-                  console.log(`✅ Item adicionado ao projeto: ${item.number}`);
-                } else {
-                  console.log('❌ ProjectV2 #7 não encontrado');
                 }
-              } catch (graphqlError) {
-                console.log(`❌ Erro na abordagem alternativa: ${graphqlError.message}`);
+              `;
+              
+              const result = await github.graphql(query);
+              console.log(`📊 Projetos encontrados: ${result.user.projectsV2.nodes.length}`);
+              
+              const projectV2 = result.user.projectsV2.nodes.find(p => p.number === 7);
+              
+              if (!projectV2) {
+                console.log('❌ ProjectV2 #7 não encontrado');
+                console.log('Projetos disponíveis:');
+                result.user.projectsV2.nodes.forEach(p => {
+                  console.log(`  - ${p.title} (#${p.number})`);
+                });
+                return;
               }
+              
+              console.log(`✅ ProjectV2 encontrado: ${projectV2.title}`);
+              console.log(`   ID: ${projectV2.id}`);
+              
+              // Adicionar item ao projeto
+              console.log('➕ Adicionando item ao projeto...');
+              
+              const addItemMutation = `
+                mutation {
+                  addProjectV2ItemById(input: {projectId: "${projectV2.id}", contentId: "${item.node_id}"}) {
+                    item {
+                      id
+                    }
+                  }
+                }
+              `;
+              
+              const addResult = await github.graphql(addItemMutation);
+              console.log(`✅ Item adicionado com sucesso!`);
+              console.log(`   Item ID: ${addResult.addProjectV2ItemById.item.id}`);
+              
+            } catch (error) {
+              console.log(`❌ Erro: ${error.message}`);
+              
+              if (error.message.includes('Could not resolve to a ProjectV2')) {
+                console.log('⚠️ Erro: ProjectV2 não pode ser resolvido');
+                console.log('💡 Possíveis causas:');
+                console.log('   1. Projeto #7 não existe');
+                console.log('   2. Projeto não é acessível com o token atual');
+                console.log('   3. Projeto foi deletado ou renomeado');
+              }
+              
+              throw error;
             }
 
   update-project-status:
@@ -109,20 +100,21 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
     steps:
-      - name: Update status based on PR state
+      - name: Log PR Status
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const pr = context.payload.pull_request;
             
-            if (pr) {
-              console.log(`📋 PR #${pr.number}: ${pr.state}`);
-              if (pr.state === 'open' && pr.draft === false) {
-                console.log('✅ PR está pronta para revisão');
-              } else if (pr.draft) {
-                console.log('📝 PR está em rascunho');
-              }
+            console.log(`📋 PR #${pr.number}: ${pr.state}`);
+            console.log(`   Título: ${pr.title}`);
+            console.log(`   Branch: ${pr.head.ref}`);
+            console.log(`   Draft: ${pr.draft}`);
+            
+            if (pr.state === 'open' && pr.draft === false) {
+              console.log('✅ PR está pronta para revisão');
+            } else if (pr.draft) {
+              console.log('📝 PR está em rascunho');
             }
 
   sync-milestones:
@@ -130,15 +122,15 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request' || github.event_name == 'issues'
     steps:
-      - name: Sync milestone
+      - name: Log Milestone Info
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const item = context.payload.pull_request || context.payload.issue;
             
             if (item && item.milestone) {
-              console.log(`✅ Sincronizando milestone: ${item.milestone.title}`);
+              console.log(`✅ Milestone: ${item.milestone.title}`);
+              console.log(`   Descrição: ${item.milestone.description || 'N/A'}`);
             } else {
               console.log(`ℹ️ Nenhum milestone associado`);
             }
