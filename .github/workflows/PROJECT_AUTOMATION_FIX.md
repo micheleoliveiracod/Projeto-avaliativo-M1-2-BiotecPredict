@@ -1,4 +1,4 @@
-# Correção da Automação de Projeto
+# Correção da Automação de Projeto - v2
 
 ## Problema Original
 O workflow "Project Automation" estava falhando com o erro:
@@ -8,33 +8,39 @@ Error: Request failed due to following response errors:
 ```
 
 ## Causa Raiz
-A ação `actions/add-to-project@v0.5.0` não conseguia resolver o ProjectV2 usando apenas o número do projeto (7). A ação esperava um ID de projeto diferente ou tinha limitações com projetos de usuário.
+A ação `actions/add-to-project@v0.5.0` não conseguia resolver o ProjectV2 usando apenas o número do projeto (7). Isso é uma limitação conhecida da ação com projetos de usuário.
 
-## Solução Implementada ✅
+## Solução Implementada v2 ✅
 
-Substituído o workflow para usar **GraphQL API do GitHub** diretamente, que é mais confiável e oferece melhor controle:
+Substituído o workflow para usar **REST API + GraphQL com fallback**:
 
-### 1. Job: `add-to-project` (Corrigido)
+### 1. Job: `add-to-project` (Corrigido - v2)
 ```yaml
-- Usa actions/github-script@v7 com GraphQL
-- Query: Busca o ProjectV2 pelo número (7)
-- Mutation: Adiciona item ao projeto usando node_id
-- Tratamento de erro: Ignora se item já existe
-- Logs melhorados com emojis (✅, ⚠️)
+Estratégia de Fallback:
+1. Tentar REST API (projects.listForUser)
+   - Busca projetos do usuário
+   - Procura por "BiotecPredict" ou número 7
+   - Cria card no projeto
+
+2. Se REST falhar, tentar GraphQL
+   - Query: Busca ProjectV2 pelo número
+   - Mutation: Adiciona item ao projeto
+   - Tratamento de erro
+
+3. Logs detalhados em cada etapa
 ```
 
 ### 2. Job: `update-project-status` (Melhorado)
 ```yaml
-- Busca campos do projeto (Status, Priority, etc)
-- Valida se campo Status existe
-- Registra estado da PR (open, draft, etc)
-- Pronto para atualizar status quando necessário
+- Valida estado da PR (open, draft, etc)
+- Registra status para sincronização futura
+- Logs informativos
 ```
 
-### 3. Job: `sync-milestones` (Melhorado)
+### 3. Job: `sync-milestones` (Mantido)
 ```yaml
-- Sincroniza milestone da PR/issue com o projeto
-- Logs informativos sobre sincronização
+- Sincroniza milestone da PR/issue
+- Logs informativos
 ```
 
 ## Configuração do Projeto
@@ -54,25 +60,102 @@ Substituído o workflow para usar **GraphQL API do GitHub** diretamente, que é 
 - feature/api-integration (PR #253)
 - feature/frontend-e2e-tests (PR #254)
 
+## Fluxo de Execução
+
+```
+PR Aberta/Modificada
+    ↓
+Workflow Acionado
+    ↓
+Job 1: add-to-project
+    ├─ Tentar REST API
+    │  ├─ Buscar projetos do usuário
+    │  ├─ Procurar BiotecPredict
+    │  └─ Criar card
+    │
+    └─ Se falhar, tentar GraphQL
+       ├─ Query ProjectV2 #7
+       ├─ Mutation addProjectV2ItemById
+       └─ Registrar sucesso/erro
+    ↓
+Job 2: update-project-status
+    ├─ Validar estado da PR
+    └─ Registrar para sincronização
+    ↓
+Job 3: sync-milestones
+    ├─ Sincronizar milestone
+    └─ Registrar sincronização
+    ↓
+✅ PR Adicionada ao Quadro
+```
+
 ## Resultado Esperado
 ✅ PRs serão adicionadas automaticamente ao quadro do projeto
+✅ Fallback automático se uma abordagem falhar
 ✅ Status será sincronizado corretamente
 ✅ Milestones serão rastreados
-✅ Sem erros de resolução de ProjectV2
+✅ Logs detalhados para debugging
+
+## Commits Realizados
+
+### Commit 1: Correção do Workflow (v1)
+```
+Hash: 3178d18
+Mensagem: fix(automation): corrigir workflow de automação de projeto usando GraphQL API
+```
+
+### Commit 2: Atualização da Documentação (v1)
+```
+Hash: 78a34cb
+Mensagem: docs(automation): atualizar documentação da correção do workflow
+```
+
+### Commit 3: Status da Automação
+```
+Hash: 5158979
+Mensagem: docs(automation): adicionar status da automação de projeto
+```
+
+### Commit 4: Correção v2 (REST API + GraphQL)
+```
+Hash: 34d5972
+Mensagem: fix(automation): usar REST API e GraphQL com fallback para adicionar PRs ao projeto
+```
 
 ## Próximos Passos
-1. ✅ Arquivo corrigido e enviado (push)
-2. ⏳ Aguardar re-execução do workflow na próxima PR/issue
-3. ⏳ Verificar se PRs aparecem no quadro
-4. ⏳ Validar sincronização de status
 
-## Commit
-- **Hash:** 3178d18
-- **Mensagem:** `fix(automation): corrigir workflow de automação de projeto usando GraphQL API`
-- **Branch:** feature/frontend-e2e-tests
-- **Data:** 31/05/2026
+1. **Aguardar Re-execução do Workflow**
+   - Será acionado na próxima PR aberta/modificada
+   - Ou pode ser acionado manualmente via GitHub Actions
+
+2. **Verificar Quadro do Projeto**
+   - Acessar: https://github.com/users/micheleoliveiracod/projects/7
+   - Validar se PRs aparecem no quadro
+
+3. **Monitorar Logs**
+   - Acessar Actions → Project Automation
+   - Verificar qual estratégia funcionou (REST ou GraphQL)
+
+4. **Validar Sincronização**
+   - Confirmar se status está sendo atualizado
+   - Verificar se milestones estão sincronizados
+
+## Troubleshooting
+
+Se ainda houver erro:
+
+1. **Verificar Permissões**
+   - Confirmar que GITHUB_TOKEN tem permissão para acessar projetos
+
+2. **Verificar Projeto**
+   - Confirmar que projeto #7 existe e é acessível
+
+3. **Verificar Logs**
+   - Acessar Actions → Project Automation
+   - Procurar por mensagens de erro específicas
 
 ---
 
-**Status:** ✅ CORRIGIDO E ENVIADO (PUSH)
+**Status:** ✅ CORRIGIDO E ENVIADO (PUSH) - v2
+**Data:** 31/05/2026
 **Próxima Ação:** Aguardar re-execução do workflow
