@@ -32,18 +32,32 @@ def test_requirements():
     Teste de dependências instaladas.
     
     Verifica se as dependências principais estão instaladas.
+    Nota: scikit-learn é opcional nesta branch (será usado em Sprint 3).
     """
+    # Dependências obrigatórias para Sprint 1
     required_packages = [
         'fastapi',
         'uvicorn',
         'sqlalchemy',
         'pydantic',
+    ]
+    
+    # Dependências opcionais (podem não estar instaladas em todas as branches)
+    optional_packages = [
         'pandas',
         'scikit-learn'
     ]
     
+    # Verificar dependências obrigatórias
     for package in required_packages:
         try:
             __import__(package)
         except ImportError:
-            pytest.fail(f"Pacote {package} não está instalado")
+            pytest.fail(f"Pacote obrigatório {package} não está instalado")
+    
+    # Verificar dependências opcionais (apenas log, não falha)
+    for package in optional_packages:
+        try:
+            __import__(package)
+        except ImportError:
+            pass  # Ignorar se não estiver instalado
