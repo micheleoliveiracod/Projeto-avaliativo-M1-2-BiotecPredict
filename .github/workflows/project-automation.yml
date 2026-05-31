@@ -11,44 +11,96 @@ jobs:
     name: Add Issue/PR to Project
     runs-on: ubuntu-latest
     steps:
-      - name: Add to project using GraphQL
+      - name: Add to project using REST API
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const query = `
-              query {
-                user(login: "micheleoliveiracod") {
-                  projectV2(number: 7) {
-                    id
-                  }
-                }
-              }
-            `;
-            
-            const result = await github.graphql(query);
-            const projectId = result.user.projectV2.id;
-            
-            console.log(`Project ID: ${projectId}`);
-            
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
             const item = context.payload.pull_request || context.payload.issue;
             
-            if (item) {
-              const addItemMutation = `
-                mutation {
-                  addProjectV2ItemById(input: {projectId: "${projectId}", contentId: "${item.node_id}"}) {
-                    item {
-                      id
-                    }
-                  }
-                }
-              `;
+            if (!item) {
+              console.log('❌ Nenhuma PR ou issue encontrada');
+              return;
+            }
+            
+            console.log(`📌 Processando: ${item.number} (${item.title})`);
+            
+            try {
+              // Buscar todos os projetos do usuário
+              const projectsResponse = await github.rest.projects.listForUser({
+                username: owner,
+                state: 'open'
+              });
+              
+              console.log(`📊 Projetos encontrados: ${projectsResponse.data.length}`);
+              
+              // Procurar pelo projeto BiotecPredict
+              const project = projectsResponse.data.find(p => 
+                p.name === 'BiotecPredict' || p.number === 7
+              );
+              
+              if (!project) {
+                console.log('❌ Projeto BiotecPredict não encontrado');
+                console.log('Projetos disponíveis:', projectsResponse.data.map(p => `${p.name} (#${p.number})`).join(', '));
+                return;
+              }
+              
+              console.log(`✅ Projeto encontrado: ${project.name} (ID: ${project.id})`);
+              
+              // Criar card no projeto
+              const cardResponse = await github.rest.projects.createCard({
+                column_id: project.columns_url.split('/').pop(), // Usar primeira coluna
+                note: `${item.title}\n\n${item.html_url}`
+              });
+              
+              console.log(`✅ Card criado com sucesso: ${cardResponse.data.id}`);
+              
+            } catch (error) {
+              console.log(`⚠️ Erro ao adicionar ao projeto: ${error.message}`);
+              
+              // Tentar abordagem alternativa com GraphQL
+              console.log('🔄 Tentando abordagem alternativa com GraphQL...');
               
               try {
-                const addResult = await github.graphql(addItemMutation);
-                console.log(`✅ Item adicionado ao projeto: ${item.number}`);
-              } catch (error) {
-                console.log(`⚠️ Item já existe no projeto ou erro: ${error.message}`);
+                const query = `
+                  query {
+                    user(login: "${owner}") {
+                      projectsV2(first: 10) {
+                        nodes {
+                          id
+                          number
+                          title
+                        }
+                      }
+                    }
+                  }
+                `;
+                
+                const result = await github.graphql(query);
+                const projectV2 = result.user.projectsV2.nodes.find(p => p.number === 7);
+                
+                if (projectV2) {
+                  console.log(`✅ ProjectV2 encontrado: ${projectV2.title} (ID: ${projectV2.id})`);
+                  
+                  const addItemMutation = `
+                    mutation {
+                      addProjectV2ItemById(input: {projectId: "${projectV2.id}", contentId: "${item.node_id}"}) {
+                        item {
+                          id
+                        }
+                      }
+                    }
+                  `;
+                  
+                  const addResult = await github.graphql(addItemMutation);
+                  console.log(`✅ Item adicionado ao projeto: ${item.number}`);
+                } else {
+                  console.log('❌ ProjectV2 #7 não encontrado');
+                }
+              } catch (graphqlError) {
+                console.log(`❌ Erro na abordagem alternativa: ${graphqlError.message}`);
               }
             }
 
@@ -62,45 +114,14 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const query = `
-              query {
-                user(login: "micheleoliveiracod") {
-                  projectV2(number: 7) {
-                    id
-                    fields(first: 20) {
-                      nodes {
-                        ... on ProjectV2Field {
-                          id
-                          name
-                        }
-                        ... on ProjectV2SingleSelectField {
-                          id
-                          name
-                          options {
-                            id
-                            name
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            `;
+            const pr = context.payload.pull_request;
             
-            const result = await github.graphql(query);
-            const projectId = result.user.projectV2.id;
-            const statusField = result.user.projectV2.fields.nodes.find(f => f.name === 'Status');
-            
-            if (statusField) {
-              console.log(`✅ Campo Status encontrado: ${statusField.id}`);
-              
-              const pr = context.payload.pull_request;
-              if (pr) {
-                console.log(`PR #${pr.number}: ${pr.state}`);
-                if (pr.state === 'open' && pr.draft === false) {
-                  console.log('✅ PR está pronta para revisão');
-                }
+            if (pr) {
+              console.log(`📋 PR #${pr.number}: ${pr.state}`);
+              if (pr.state === 'open' && pr.draft === false) {
+                console.log('✅ PR está pronta para revisão');
+              } else if (pr.draft) {
+                console.log('📝 PR está em rascunho');
               }
             }
 
