@@ -1,0 +1,284 @@
+.sensor-charts-container {
+  width: 100%;
+  padding: 24px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+}
+
+/* Header */
+.charts-header {
+  margin-bottom: 24px;
+}
+
+.charts-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 8px 0;
+}
+
+.charts-subtitle {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* Charts Grid */
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+/* Chart Card */
+.chart-card {
+  background: #f9fafb;
+  border-radius: 8px;
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  transition: all 0.3s ease;
+}
+
+.chart-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: #d1d5db;
+}
+
+/* Chart Header */
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.chart-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+}
+
+.chart-unit {
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+/* Chart Container */
+.chart-container {
+  width: 100%;
+  height: 250px;
+  margin-bottom: 12px;
+}
+
+/* Chart Info */
+.chart-info {
+  padding: 8px;
+  background: white;
+  border-radius: 4px;
+  border-left: 3px solid #3b82f6;
+}
+
+.info-text {
+  margin: 0;
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+/* Custom Tooltip */
+.custom-tooltip {
+  background: white;
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.tooltip-label {
+  margin: 0 0 4px 0;
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.tooltip-value {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* Legend */
+.charts-legend {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.legend-label {
+  font-size: 12px;
+  color: #374151;
+  font-weight: 500;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .charts-grid {
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 16px;
+  }
+
+  .chart-container {
+    height: 200px;
+  }
+}
+
+@media (max-width: 768px) {
+  .sensor-charts-container {
+    padding: 16px;
+  }
+
+  .charts-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .chart-container {
+    height: 200px;
+  }
+
+  .charts-legend {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .charts-title {
+    font-size: 18px;
+  }
+
+  .charts-subtitle {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .sensor-charts-container {
+    padding: 12px;
+  }
+
+  .charts-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .chart-card {
+    padding: 12px;
+  }
+
+  .chart-container {
+    height: 180px;
+  }
+
+  .charts-legend {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 12px;
+  }
+
+  .charts-title {
+    font-size: 16px;
+  }
+
+  .charts-subtitle {
+    font-size: 12px;
+  }
+
+  .chart-title {
+    font-size: 13px;
+  }
+
+  .chart-unit {
+    font-size: 11px;
+  }
+}
+
+/* Dark Mode Support (Optional) */
+@media (prefers-color-scheme: dark) {
+  .sensor-charts-container {
+    background: #1f2937;
+    border-color: #374151;
+  }
+
+  .charts-title {
+    color: #f3f4f6;
+  }
+
+  .charts-subtitle {
+    color: #9ca3af;
+  }
+
+  .chart-card {
+    background: #111827;
+    border-color: #374151;
+  }
+
+  .chart-title {
+    color: #f3f4f6;
+  }
+
+  .chart-unit {
+    color: #9ca3af;
+  }
+
+  .chart-info {
+    background: #1f2937;
+    border-left-color: #60a5fa;
+  }
+
+  .info-text {
+    color: #9ca3af;
+  }
+
+  .custom-tooltip {
+    background: #1f2937;
+    border-color: #374151;
+  }
+
+  .tooltip-label {
+    color: #9ca3af;
+  }
+
+  .tooltip-value {
+    color: #f3f4f6;
+  }
+
+  .charts-legend {
+    background: #111827;
+    border-color: #374151;
+  }
+
+  .legend-label {
+    color: #d1d5db;
+  }
+}
