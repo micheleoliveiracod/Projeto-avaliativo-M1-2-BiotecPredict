@@ -1,64 +1,88 @@
-"""
-Compliance Routes - Endpoints para consulta de compliance score.
-
-Endpoints:
-- GET /api/v1/compliance/{batch_id} - Obter compliance score de um batch
-"""
+"""API routes para Compliance Score."""
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from backend.db.database import get_db
-from backend.services import DataService
-from pydantic import BaseModel
-from typing import Optional
+from backend.db.connection import get_db
+from backend.services.compliance_service import ComplianceService
+from backend.db.repository import BatchRepository, SensorReadingRepository
+from typing import Dict, Any
 
 router = APIRouter(prefix="/api/v1", tags=["compliance"])
 
 
-class ComplianceResponse(BaseModel):
-    """Response model para compliance score."""
-
-    batch_id: int
-    compliance_score: Optional[float]
-    classification: Optional[str]  # ACCEPTABLE, WARNING, CRITICAL
-
-    class Config:
-        from_attributes = True
-
-
-@router.get("/compliance/{batch_id}", response_model=ComplianceResponse)
-def get_compliance(batch_id: int, db: Session = Depends(get_db)):
+@router.get("/compliance/{batch_id}")
+def get_compliance_score(batch_id: int, db: Session = Depends(get_db)) -> Dict[str, Any]:
     """
-    Obter compliance score de um batch.
-
-    Path Parameters:
-    - batch_id: ID do batch
+    Obtém Manufacturing Compliance Score para um batch.
 
     Returns:
-        ComplianceResponse com score e classificação
-
-    Raises:
-        404: Se batch não encontrado
+        - score: Score 0-100
+        - classification: ACCEPTABLE, WARNING ou CRITICAL
+        - metrics: Métricas detalhadas por sensor
     """
-    try:
-        compliance_score = DataService.get_compliance_score(db, batch_id)
-        if compliance_score is None:
-            raise HTTPException(status_code=404, detail=f"Batch {batch_id} não encontrado")
+    batch = BatchRepository.get_by_id(db, batch_id)
+    if not batch:
+        raise HTTPException(status_code=404, detail=f"Batch {batch_id} não encontrado")
 
-        # Classificar score
-        if compliance_score >= 80:
-            classification = "ACCEPTABLE"
-        elif compliance_score >= 60:
-            classification = "WARNING"
-        else:
-            classification = "CRITICAL"
+    sensor_readings = SensorReadingRepository.get_by_batch_id(db, batch_id)
+    if not sensor_readings:
+        raise HTTPException(status_code=404, detail=f"Nenhuma leitura de sensor para batch {batch_id}")
 
-        return ComplianceResponse(
-            batch_id=batch_id,
-            compliance_score=compliance_score,
-            classification=classification,
-        )
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Erro ao obter compliance: {str(e)}")
+    # Converter para dicionários
+    readings_data = [
+        {
+            "temperature": reading.temperature,
+            "ph": reading.ph,
+            "dissolved_oxygen": reading.dissolved_oxygen,
+            "pressure": reading.pressure,
+            "agitator_speed": reading.agitator_speed,
+        }
+        for reading in sensor_readings
+    ]
+
+    score, classification = ComplianceService.calculate_compliance_score(readings_data)
+    metrics = ComplianceService.get_sensor_metrics(readings_data)
+
+    return {
+        "batch_id": batch_id,
+        "compliance_score": score,
+        "classification": classification,
+        "sensor_metrics": metrics,
+        "interpretation": ComplianceService._interpret_risk(classification),
+    }
+
+
+@router.get("/batch/{batch_id}/sensors")
+def get_batch_sensors(batch_id: int, db: Session = Depends(get_db)) -> Dict[str, Any]:
+    """
+    Obtém todas as leituras de sensores para um batch.
+
+    Returns:
+        - batch_id: ID do batch
+        - count: Número de leituras
+        - readings: Lista de leituras com dados de sensores
+    """
+    batch = BatchRepository.get_by_id(db, batch_id)
+    if not batch:
+        raise HTTPException(status_code=404, detail=f"Batch {batch_id} não encontrado")
+
+    sensor_readings = SensorReadingRepository.get_by_batch_id(db, batch_id)
+
+    readings = [
+        {
+            "id": reading.id,
+            "temperature": reading.temperature,
+            "ph": reading.ph,
+            "dissolved_oxygen": reading.dissolved_oxygen,
+            "pressure": reading.pressure,
+            "agitator_speed": reading.agitator_speed,
+            "recorded_at": reading.recorded_at.isoformat() if reading.recorded_at else None,
+        }
+        for reading in sensor_readings
+    ]
+
+    return {
+        "batch_id": batch_id,
+        "count": len(readings),
+        "readings": readings,
+    }
