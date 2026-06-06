@@ -5,13 +5,20 @@ on:
     branches: [ develop ]
     paths-ignore:
       - 'docs/**'
-      - '.kiro/steering/**'
+      - '.specs/**'
+      - '.github/issue_template/**'
+      - '*.md'
+  pull_request:
+    branches: [ develop ]
+    paths-ignore:
+      - 'docs/**'
+      - '.specs/**'
       - '.github/issue_template/**'
       - '*.md'
 
-# Concorrência: Apenas uma execução por branch
+# Concorrência: Apenas uma execução por branch/PR
 concurrency:
-  group: ci-${{ github.ref }}
+  group: ci-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -53,42 +60,27 @@ jobs:
   backend-tests:
     runs-on: ubuntu-latest
     name: Backend - Unit Tests (pytest)
-    
-    services:
-      postgres:
-        image: postgres:15-alpine
-        env:
-          POSTGRES_USER: biotech_user
-          POSTGRES_PASSWORD: biotech_password
-          POSTGRES_DB: biotecpredict
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
-    
+
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-      
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           cd backend && pip install -r requirements.txt
           pip install pytest pytest-cov
-      
+
       - name: Run pytest with coverage
         run: |
           cd backend
           pytest tests/pytest/ --cov=. --cov-report=xml --cov-report=html -v
         env:
-          DATABASE_URL: postgresql://biotech_user:biotech_password@localhost:5432/biotecpredict
+          DATABASE_URL: sqlite:///./biotecpredict_test.db
       
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
@@ -155,55 +147,38 @@ jobs:
   api-integration-tests:
     runs-on: ubuntu-latest
     name: API - Integration Tests (Postman/Newman)
-    
-    services:
-      postgres:
-        image: postgres:15-alpine
-        env:
-          POSTGRES_USER: biotech_user
-          POSTGRES_PASSWORD: biotech_password
-          POSTGRES_DB: biotecpredict
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
-    
+
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-      
+
       - name: Install backend dependencies
         run: |
           python -m pip install --upgrade pip
           cd backend && pip install -r requirements.txt
-      
+
       - name: Start FastAPI server
         run: |
-          cd backend
-          python -m uvicorn main:app --host 0.0.0.0 --port 8000 &
+          python -m uvicorn backend.main:app --host 0.0.0.0 --port 8001 &
           sleep 5
         env:
-          DATABASE_URL: postgresql://biotech_user:biotech_password@localhost:5432/biotecpredict
-      
+          DATABASE_URL: sqlite:///./biotecpredict.db
+
       - name: Set up Node.js for Newman
         uses: actions/setup-node@v3
         with:
           node-version: '18'
-      
+
       - name: Install Newman
         run: npm install -g newman
-      
+
       - name: Run Postman collection tests
         run: |
-          newman run backend/tests/postman/BiotecPredict.postman_collection.json \
-            --environment backend/tests/postman/BiotecPredict.postman_environment.json \
+          newman run docs/postman/BiotecPredict.postman_collection.json \
             --reporters cli,json \
             --reporter-json-export postman-results.json || true
 

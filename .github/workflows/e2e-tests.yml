@@ -13,21 +13,6 @@ jobs:
     runs-on: ubuntu-latest
     name: E2E Tests (Cypress)
     
-    services:
-      postgres:
-        image: postgres:15-alpine
-        env:
-          POSTGRES_USER: biotech_user
-          POSTGRES_PASSWORD: biotech_password
-          POSTGRES_DB: biotecpredict
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
-    
     steps:
       - uses: actions/checkout@v3
       
@@ -56,10 +41,10 @@ jobs:
       - name: Start backend server
         run: |
           cd backend
-          python -m uvicorn main:app --host 0.0.0.0 --port 8000 &
+          python -m uvicorn main:app --host 0.0.0.0 --port 8001 &
           sleep 5
         env:
-          DATABASE_URL: postgresql://biotech_user:biotech_password@localhost:5432/biotecpredict
+          DATABASE_URL: sqlite:///./biotecpredict.db
       
       - name: Start frontend dev server
         run: |
