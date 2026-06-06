@@ -1,0 +1,4 @@
+temperature,ph,dissolved_oxygen,pressure,agitator_speed
+abc,7.0,85.0,5.0,260
+25.0,xyz,85.0,5.0,260
+25.0,7.0,none,5.0,260
