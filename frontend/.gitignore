@@ -43,7 +43,7 @@ yarn-error.log
 # ============================================================================
 # Dependências
 # ============================================================================
-package-lock.json
+# package-lock.json é versionado para garantir builds reproduzíveis no CI
 yarn.lock
 pnpm-lock.yaml
 .pnp
