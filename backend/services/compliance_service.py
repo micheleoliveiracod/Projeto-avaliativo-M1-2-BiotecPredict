@@ -55,7 +55,6 @@ class ComplianceService:
             return 0.0, "CRITICAL"
 
         sensor_scores = {}
-        total_penalty = 0.0
 
         for sensor_name, sensor_range in SENSOR_RANGES.items():
             values = [reading.get(sensor_name) for reading in sensor_readings if sensor_name in reading]
@@ -63,67 +62,61 @@ class ComplianceService:
                 continue
 
             avg_value = sum(values) / len(values)
-            sensor_score, penalty = ComplianceService._calculate_sensor_score(
+            sensor_score = ComplianceService._calculate_sensor_score(
                 sensor_name, avg_value, sensor_range
             )
             sensor_scores[sensor_name] = sensor_score
-            total_penalty += penalty
 
         # Média dos scores dos sensores
         if not sensor_scores:
             return 0.0, "CRITICAL"
 
         average_score = sum(sensor_scores.values()) / len(sensor_scores)
-        final_score = max(0.0, average_score - total_penalty)
-        final_score = min(100.0, final_score)
+        final_score = min(100.0, max(0.0, average_score))
 
         classification = ComplianceService._classify_score(final_score)
 
         return round(final_score, 2), classification
 
     @staticmethod
-    def _calculate_sensor_score(sensor_name: str, value: float, sensor_range: SensorRange) -> Tuple[float, float]:
+    def _calculate_sensor_score(sensor_name: str, value: float, sensor_range: SensorRange) -> float:
         """
-        Calcula score para um sensor individual.
+        Calcula score para um sensor individual (0-100).
 
-        Returns:
-            Tupla (score_0_100, penalty_0_100)
+        Faixa ideal      → 90-100 (pequena penalidade por distância do centro)
+        Faixa aceitável  → 60-90  (proporcional ao desvio do ideal)
+        Fora da faixa    → 0      (violação crítica)
         """
-        # Score baseado na distância da faixa ideal
         if sensor_range.ideal_min <= value <= sensor_range.ideal_max:
-            # Dentro do ideal: score alto
             distance_from_center = abs(value - (sensor_range.ideal_min + sensor_range.ideal_max) / 2)
             range_width = sensor_range.ideal_max - sensor_range.ideal_min
             deviation_ratio = distance_from_center / (range_width / 2) if range_width > 0 else 0
-            score = 100 - (deviation_ratio * 10)  # Máximo -10 pontos
+            score = 100 - (deviation_ratio * 10)
         elif sensor_range.min_value <= value <= sensor_range.max_value:
-            # Dentro da faixa aceitável mas fora do ideal: score médio
             if value < sensor_range.ideal_min:
                 distance = sensor_range.ideal_min - value
+                band = sensor_range.ideal_min - sensor_range.min_value
             else:
                 distance = value - sensor_range.ideal_max
-            acceptable_range = (sensor_range.ideal_min - sensor_range.min_value) or (
-                sensor_range.max_value - sensor_range.ideal_max
-            )
-            deviation_ratio = distance / acceptable_range if acceptable_range > 0 else 1.0
-            score = 60 + (40 * (1 - min(1.0, deviation_ratio)))
+                band = sensor_range.max_value - sensor_range.ideal_max
+            deviation_ratio = distance / band if band > 0 else 1.0
+            score = 60 + (30 * (1 - min(1.0, deviation_ratio)))
         else:
-            # Fora da faixa aceitável: score crítico
             score = 0.0
 
-        # Penalidade por desvios críticos
-        penalty = 0.0
-        if value < sensor_range.min_value or value > sensor_range.max_value:
-            penalty = 20.0  # Penalidade significativa por violação crítica
-
-        return max(0.0, score), penalty
+        return max(0.0, score)
 
     @staticmethod
     def _classify_score(score: float) -> str:
-        """Classifica score em categorias."""
+        """Classifica score em categorias.
+
+        ACCEPTABLE (>= 80): todos os sensores dentro da faixa aceitável
+        WARNING    (>= 45): 1-2 sensores fora da faixa aceitável
+        CRITICAL   (<  45): 3+ sensores fora da faixa aceitável
+        """
         if score >= 80:
             return "ACCEPTABLE"
-        elif score >= 60:
+        elif score >= 45:
             return "WARNING"
         else:
             return "CRITICAL"

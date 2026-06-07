@@ -978,7 +978,7 @@ A Sprint 0 (Especificação e arquitetura) roda apenas lint/setup na branch `fea
 - **Lint**: ESLint
 - **Testes**: Vitest com coverage
 - **Cobertura mínima**: 70%
-- **Node.js**: 18+
+- **Node.js**: 20+
 
 ### Monitoramento de Workflows
 
@@ -1209,17 +1209,27 @@ A master checklist mapeia os critérios de avaliação do projeto:
 
 | # | Critério | Peso | Status | Evidência |
 |---|----------|------|--------|-----------|
-| 1 | Apresentação clara e objetiva | 10% | ⬜ | Vídeo no README |
-| 2 | Uso correto do GitHub Board | 10% | ⬜ | Board com 6 colunas |
-| 3 | Organização do repositório | 10% | ⬜ | GitFlow + Conventional Commits |
-| 4 | Funcionalidades implementadas | 15% | ⬜ | Upload, Compliance, ML, ETL |
-| 5 | Arquitetura e design | 10% | ⬜ | Clean Architecture + ETL distribuído |
-| 6 | Testes automatizados | 15% | ⬜ | Cobertura ≥ 70% |
-| 7 | Documentação técnica | 10% | ⬜ | README + API docs + Steering |
-| 8 | Pipeline CI/CD | 10% | ⬜ | GitHub Actions workflows |
-| 9 | Uso de IA no desenvolvimento | 5% | ⬜ | Kiro + hooks |
-| 10 | Análise crítica de IA | 5% | ⬜ | Documento de análise |
-| 11 | Rastreabilidade e qualidade | 10% | ⬜ | Prompts + Validação + Compliance |
+| 1 | Apresentação clara e objetiva | 10% | ⬜ **PENDENTE** | Vídeo não gravado — única pendência crítica |
+| 2 | Uso correto do GitHub Board | 10% | ✅ | Board configurado; `project-automation.yml` move cards automaticamente |
+| 3 | Organização do repositório | 10% | ✅ | GitFlow + Conventional Commits + PR/Issue templates + 264+ PRs mergeados |
+| 4 | Funcionalidades implementadas | 15% | ✅ | Upload CSV, Compliance Score, ML (RandomForest), Dashboard, ETL — todos funcionando |
+| 5 | Arquitetura e design | 10% | ✅ | Clean Architecture + ETL distribuído (Extract→Transform→Load→Validate) |
+| 6 | Testes automatizados | 15% | ✅ | 63 testes de integração (pytest) + Postman collection + Vitest frontend |
+| 7 | Documentação técnica | 10% | ✅ | README + Swagger (`/docs`) + `docs/prompts/` (7 arquivos) + PRD + DIAGRAMAS + analise-resultados |
+| 8 | Pipeline CI/CD | 10% | ✅ | 4 workflows: `ci.yml`, `cd.yml`, `project-automation.yml`, `release-lint.yml` — todos funcionando |
+| 9 | Uso de IA no desenvolvimento | 5% | ✅ | Claude AI (Claude Code) usado em geração de código, refatoração, testes e documentação |
+| 10 | Análise crítica de IA | 5% | ✅ | `docs/prompts/03-refatoracao.md` (3 refatorações com análise crítica de Michele) + `docs/prompts/07-analise-critica.md` |
+| 11 | Rastreabilidade e qualidade | 10% | ✅ | 7 arquivos `docs/prompts/01–07`, 13 fixtures CSV, scripts de validação, `docs/analise-resultados.md` |
+
+> **Última atualização:** Junho de 2026 — Score estimado: **90/100** (apenas critério 1 pendente)
+
+### ⚠️ Pendências para Entrega Final
+
+| Item | Ação necessária | Prazo |
+|------|----------------|-------|
+| **Vídeo de apresentação** (10%) | Gravar vídeo de até 10 minutos demonstrando o sistema em funcionamento, explicando a arquitetura e o uso de IA; hospedar no YouTube/Vimeo e adicionar link no README | Antes da entrega |
+| **Tag de release v1.0.0** | Criar PR `develop → main` e tag `v1.0.0` após gravar o vídeo | Após o vídeo |
+| **Fechar issue #234** | Chore de entrega final — fechar com link para o vídeo e tag | Após o merge |
 
 ### Atualização da Master Checklist
 

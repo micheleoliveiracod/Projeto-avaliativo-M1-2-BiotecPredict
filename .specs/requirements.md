@@ -34,8 +34,9 @@ Este documento especifica os requisitos funcionais e não-funcionais para a Plat
 4. **Manufacturing Compliance Score** ✅
    - Cálculo baseado em regras determinísticas
    - Score 0-100
-   - Classificação: ACCEPTABLE (80-100), WARNING (60-79), CRITICAL (0-59)
+   - Classificação: ACCEPTABLE (≥80), WARNING (45–79), CRITICAL (<45)
    - Regras configuráveis por variável
+   - Nota: threshold de WARNING ajustado de 60 para 45 após correção de penalidade dupla no cálculo original (ver `docs/prompts/03-refatoracao.md` — Refatoração 3)
 
 5. **Validação de Especificações** ✅
    - Verificação de ranges esperados

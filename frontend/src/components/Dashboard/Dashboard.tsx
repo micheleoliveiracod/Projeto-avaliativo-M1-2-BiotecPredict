@@ -382,13 +382,13 @@ const Dashboard: React.FC<DashboardProps> = ({ refreshInterval = 30000 }) => {
               <span className="sensor-value">{sensorData.temperature.toFixed(1)}</span>
             </div>
             <div className="sensor-range">
-              <p className="range-text">Range: 20 - 45°C</p>
+              <p className="range-text">Aceitável: 20 – 30°C | Ideal: 24 – 26°C</p>
               <div className="range-bar">
-                <div 
+                <div
                   className="range-fill"
-                  style={{ 
-                    width: `${Math.min(100, (sensorData.temperature / 45) * 100)}%`,
-                    backgroundColor: sensorData.temperature >= 20 && sensorData.temperature <= 45 ? '#10b981' : '#ef4444'
+                  style={{
+                    width: `${Math.min(100, ((sensorData.temperature - 20) / 10) * 100)}%`,
+                    backgroundColor: sensorData.temperature >= 20 && sensorData.temperature <= 30 ? '#10b981' : '#ef4444'
                   }}
                 ></div>
               </div>
@@ -405,13 +405,13 @@ const Dashboard: React.FC<DashboardProps> = ({ refreshInterval = 30000 }) => {
               <span className="sensor-value">{sensorData.ph.toFixed(2)}</span>
             </div>
             <div className="sensor-range">
-              <p className="range-text">Range: 4.0 - 9.0</p>
+              <p className="range-text">Aceitável: 6.5 – 7.5 | Ideal: 6.8 – 7.2</p>
               <div className="range-bar">
-                <div 
+                <div
                   className="range-fill"
-                  style={{ 
-                    width: `${Math.min(100, ((sensorData.ph - 4) / 5) * 100)}%`,
-                    backgroundColor: sensorData.ph >= 4 && sensorData.ph <= 9 ? '#10b981' : '#ef4444'
+                  style={{
+                    width: `${Math.min(100, ((sensorData.ph - 6.5) / 1.0) * 100)}%`,
+                    backgroundColor: sensorData.ph >= 6.5 && sensorData.ph <= 7.5 ? '#10b981' : '#ef4444'
                   }}
                 ></div>
               </div>
@@ -428,13 +428,13 @@ const Dashboard: React.FC<DashboardProps> = ({ refreshInterval = 30000 }) => {
               <span className="sensor-value">{sensorData.dissolved_oxygen.toFixed(1)}</span>
             </div>
             <div className="sensor-range">
-              <p className="range-text">Range: 0 - 100%</p>
+              <p className="range-text">Aceitável: 70 – 100% | Ideal: 80 – 95%</p>
               <div className="range-bar">
-                <div 
+                <div
                   className="range-fill"
-                  style={{ 
-                    width: `${Math.min(100, sensorData.dissolved_oxygen)}%`,
-                    backgroundColor: sensorData.dissolved_oxygen >= 0 && sensorData.dissolved_oxygen <= 100 ? '#10b981' : '#ef4444'
+                  style={{
+                    width: `${Math.min(100, ((sensorData.dissolved_oxygen - 70) / 30) * 100)}%`,
+                    backgroundColor: sensorData.dissolved_oxygen >= 70 && sensorData.dissolved_oxygen <= 100 ? '#10b981' : '#ef4444'
                   }}
                 ></div>
               </div>
@@ -451,13 +451,13 @@ const Dashboard: React.FC<DashboardProps> = ({ refreshInterval = 30000 }) => {
               <span className="sensor-value">{sensorData.pressure.toFixed(2)}</span>
             </div>
             <div className="sensor-range">
-              <p className="range-text">Range: 0 - 10 bar</p>
+              <p className="range-text">Aceitável: 4.5 – 6.0 bar | Ideal: 4.8 – 5.5 bar</p>
               <div className="range-bar">
-                <div 
+                <div
                   className="range-fill"
-                  style={{ 
-                    width: `${Math.min(100, (sensorData.pressure / 10) * 100)}%`,
-                    backgroundColor: sensorData.pressure >= 0 && sensorData.pressure <= 10 ? '#10b981' : '#ef4444'
+                  style={{
+                    width: `${Math.min(100, ((sensorData.pressure - 4.5) / 1.5) * 100)}%`,
+                    backgroundColor: sensorData.pressure >= 4.5 && sensorData.pressure <= 6.0 ? '#10b981' : '#ef4444'
                   }}
                 ></div>
               </div>
@@ -474,13 +474,13 @@ const Dashboard: React.FC<DashboardProps> = ({ refreshInterval = 30000 }) => {
               <span className="sensor-value">{sensorData.agitator_speed.toFixed(0)}</span>
             </div>
             <div className="sensor-range">
-              <p className="range-text">Range: 0 - 500 RPM</p>
+              <p className="range-text">Aceitável: 200 – 300 RPM | Ideal: 240 – 280 RPM</p>
               <div className="range-bar">
-                <div 
+                <div
                   className="range-fill"
-                  style={{ 
-                    width: `${Math.min(100, (sensorData.agitator_speed / 500) * 100)}%`,
-                    backgroundColor: sensorData.agitator_speed >= 0 && sensorData.agitator_speed <= 500 ? '#10b981' : '#ef4444'
+                  style={{
+                    width: `${Math.min(100, ((sensorData.agitator_speed - 200) / 100) * 100)}%`,
+                    backgroundColor: sensorData.agitator_speed >= 200 && sensorData.agitator_speed <= 300 ? '#10b981' : '#ef4444'
                   }}
                 ></div>
               </div>
