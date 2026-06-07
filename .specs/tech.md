@@ -25,6 +25,7 @@ Definição das tecnologias utilizadas no projeto. Onde a tecnologia específica
 
 | Tecnologia | Papel | Versão |
 |---|---|---|
+| **Node.js** | Runtime de build e testes do frontend | **20+** (Dockerfile atualizado de 18→20) |
 | **React** | Framework principal do frontend | 18+ |
 | **TypeScript** | Tipagem estática | 5.0+ |
 | **Vite** | Build tool rápido | 5.0+ |
