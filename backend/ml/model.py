@@ -76,9 +76,9 @@ class MLModel:
 
     def _generate_synthetic_data(self, n_samples: int) -> np.ndarray:
         """Gera dados sintéticos cobrindo zonas ideal, aceitável e fora de spec."""
-        n_low    = int(n_samples * 0.60)  # dentro da faixa aceitável
-        n_medium = int(n_samples * 0.25)  # 1-2 sensores fora da faixa
-        n_high   = n_samples - n_low - n_medium  # 3+ sensores fora
+        n_low    = int(n_samples * 0.50)  # todos dentro da faixa aceitável
+        n_medium = int(n_samples * 0.30)  # 1-2 sensores fora da faixa
+        n_high   = n_samples - n_low - n_medium  # 3-5 sensores fora
 
         def _sample_acceptable(n):
             return np.column_stack([
@@ -92,34 +92,54 @@ class MLModel:
         def _sample_out_of_range(n, n_out):
             """n_out sensores fora da faixa aceitável para cada amostra."""
             base = _sample_acceptable(n)
+            # Ranges fora de spec: cobre tanto valores abaixo quanto acima do limite,
+            # incluindo valores extremos observados nos CSVs de teste.
             out_ranges = [
-                (-5.0, 19.9),   # temperature abaixo
-                (30.1, 40.0),   # temperature acima
-                (5.0, 6.4),     # ph abaixo
-                (7.6, 9.0),     # ph acima
-                (0.0, 69.9),    # dissolved_oxygen abaixo
-                (0.0, 4.4),     # pressure abaixo
-                (50,  199),     # agitator_speed abaixo
+                (-5.0, 19.9),    # temperature abaixo
+                (30.1, 45.0),    # temperature acima (estendido até 45°C)
+                (5.0,  6.4),     # ph abaixo
+                (7.6,  9.5),     # ph acima (estendido até 9.5)
+                (0.0,  69.9),    # dissolved_oxygen abaixo
+                (0.0,  4.4),     # pressure abaixo
+                (6.1,  8.0),     # pressure acima
+                (50,   199),     # agitator_speed abaixo
+                (301,  450),     # agitator_speed acima
             ]
+            col_filter = {
+                0: lambda r: r[1] < 20 or r[0] > 30,     # temperature
+                1: lambda r: r[1] < 6.5 or r[0] > 7.5,  # ph
+                2: lambda r: r[1] < 70,                   # dissolved_oxygen
+                3: lambda r: r[1] < 4.5 or r[0] > 6.0,  # pressure
+                4: lambda r: r[1] < 200 or r[0] > 300,  # agitator_speed
+            }
             for row in range(n):
                 cols = np.random.choice(5, size=n_out, replace=False)
                 for col in cols:
-                    col_ranges = [r for r in out_ranges if
-                                  (col == 0 and r[1] < 20) or
-                                  (col == 0 and r[0] > 30) or
-                                  (col == 1 and r[1] < 6.5) or
-                                  (col == 1 and r[0] > 7.5) or
-                                  (col == 2 and r[1] < 70) or
-                                  (col == 3 and r[1] < 4.5) or
-                                  (col == 4 and r[1] < 200)]
-                    if col_ranges:
-                        lo, hi = col_ranges[np.random.randint(len(col_ranges))]
+                    candidates = [r for r in out_ranges if col_filter[col](r)]
+                    if candidates:
+                        lo, hi = candidates[np.random.randint(len(candidates))]
                         base[row, col] = np.random.uniform(lo, hi)
             return base
 
-        X_low    = _sample_acceptable(n_low)
-        X_medium = _sample_out_of_range(n_medium, 1)
-        X_high   = _sample_out_of_range(n_high, 3)
+        X_low = _sample_acceptable(n_low)
+
+        # Médio: metade com 1 sensor fora, metade com 2 — sem gap no treino
+        n_med1 = n_medium // 2
+        n_med2 = n_medium - n_med1
+        X_medium = np.vstack([
+            _sample_out_of_range(n_med1, 1),
+            _sample_out_of_range(n_med2, 2),
+        ])
+
+        # Alto: distribuído entre 3, 4 e 5 sensores fora
+        n_high3 = n_high // 3
+        n_high4 = n_high // 3
+        n_high5 = n_high - n_high3 - n_high4
+        X_high = np.vstack([
+            _sample_out_of_range(n_high3, 3),
+            _sample_out_of_range(n_high4, 4),
+            _sample_out_of_range(n_high5, 5),
+        ])
 
         return np.vstack([X_low, X_medium, X_high])
 
