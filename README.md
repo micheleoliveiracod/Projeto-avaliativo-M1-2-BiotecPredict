@@ -392,16 +392,21 @@ GET http://localhost:8000/api/v1/batch/BATCH001
 
 ## M07 — Caso Documentado de Saída Incorreta da IA
 
-### ⚠️ Status: Em Construção
+### ⚠️ Casos Reais Documentados
 
-Este documento será preenchido durante a execução do projeto com exemplos reais de:
+A IA (Claude Sonnet 4.6) gerou código com erros lógicos em três pontos do sistema durante o desenvolvimento. Os casos estão totalmente documentados em [docs/m07-saida-incorreta-ia.md](docs/m07-saida-incorreta-ia.md).
 
-- Casos onde a IA gerou código incorreto
-- Como o erro foi identificado
-- Como foi corrigido
-- Lições aprendidas
+#### Resumo dos Casos
 
-**Placeholder:** Será atualizado após testes em produção.
+| Caso | Módulo | Erro da IA | Impacto |
+|------|--------|-----------|---------|
+| 1 | `compliance_service.py` | Penalidade dupla no cálculo do score + threshold errado | Batches `WARNING` classificados como `CRITICAL` |
+| 2 | `ml/model.py` | Dataset de treino sem classe `MEDIUM RISK` + ranges de sensores estreitos | Modelo nunca previa risco médio |
+| 3 | `Dashboard.tsx` | Ranges dos indicadores visuais divergiam do backend | Dashboard mostrava verde para sensores fora do spec |
+
+**Commit de correção:** `f87c41e`
+
+**Documentação completa:** [docs/m07-saida-incorreta-ia.md](docs/m07-saida-incorreta-ia.md)
 
 ---
 
@@ -439,11 +444,9 @@ Este documento será preenchido durante a execução do projeto com exemplos rea
 
 ### 🎬 Apresentação do Projeto
 
-**Status:** Em Construção
+**Status:** ✅ Publicado
 
-**Link:** [Assista a apresentação completa do BiotecPredict no YouTube](https://www.youtube.com/watch?v=LINK_DO_VIDEO)
-
-> O vídeo será publicado após a conclusão do projeto. Substitua `LINK_DO_VIDEO` pelo link real quando disponível.
+**Link:** [Assista a apresentação completa do BiotecPredict no YouTube](https://youtu.be/9Pax-hNaamo)
 
 **Conteúdo do Vídeo:**
 - Demonstração da plataforma
@@ -470,6 +473,35 @@ Consulte [GitFlow](.specs/gitflow.md) para mais detalhes.
 
 ---
 
+## ✅ Checklist Final de Entrega
+
+### Requisitos Obrigatórios do Projeto Avaliativo
+
+| # | Requisito | Status | Observação |
+|---|-----------|--------|------------|
+| M01 | Nome do projeto e problema resolvido | ✅ Completo | Documentado no README |
+| M02 | Ferramentas de IA utilizadas | ✅ Completo | Kiro + Claude Code documentados |
+| M03 | Padrões de prompting aplicados | ✅ Completo | 7 padrões documentados |
+| M04 | Diagrama ou descrição da arquitetura | ✅ Completo | ASCII diagram + stack tecnológica |
+| M05 | Instruções completas de instalação e execução | ✅ Completo | Docker em 3 passos |
+| M06 | Cenários de uso com exemplos | ✅ Completo | 3 cenários com exemplos reais |
+| M07 | Caso documentado de saída incorreta da IA | ✅ Completo | 3 casos reais documentados em [docs/m07-saida-incorreta-ia.md](docs/m07-saida-incorreta-ia.md) |
+| M08 | Melhorias futuras | ✅ Completo | Roadmap em 4 fases |
+| M09 | Link do vídeo no YouTube | ✅ Completo | https://youtu.be/9Pax-hNaamo |
+| M10 | LICENSE | ✅ Completo | MIT License |
+
+### Pendências Técnicas
+
+| Item | Status | Ação Necessária |
+|------|--------|-----------------|
+| Branch `docs/docs-prompts-deploy` → `main` | ⚠️ Pendente | Abrir PR e fazer merge final |
+| Seção M07 (saída incorreta da IA) | ✅ Concluído | 3 casos reais documentados em docs/m07-saida-incorreta-ia.md |
+| Email do desenvolvedor no README | ✅ Concluído | data.analystmlso@gmail.com |
+| Arquivo `.env.example` | ✅ Presente | Verificar se está completo antes do merge |
+| `biotecpredict.db` no `.gitignore` | ✅ Concluído | Regra `*.db` adicionada ao .gitignore |
+
+---
+
 ## 📚 Documentação Adicional
 
 - [Documentação Técnica](docs/README.md)
@@ -483,7 +515,7 @@ Consulte [GitFlow](.specs/gitflow.md) para mais detalhes.
 
 **Michele Oliveira**
 - GitHub: [@micheleoliveiracod](https://github.com/micheleoliveiracod)
-- Email: [seu-email@example.com]
+- Email: [data.analystmlso@gmail.com](mailto:data.analystmlso@gmail.com)
 
 ---
 
