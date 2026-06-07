@@ -1,0 +1,582 @@
+{
+  "info": {
+    "_postman_id": "biotecpredict-api-v1",
+    "name": "BiotecPredict API",
+    "description": "Coleção completa de testes da API BiotecPredict — Plataforma de Manufatura Preditiva.\n\nVariáveis de ambiente necessárias:\n- base_url: http://localhost:8001 (ou 8000 em produção)\n\nFluxo de uso:\n1. Executar 'Health Check'\n2. Executar 'Upload CSV Válido'\n3. Copiar o 'id' retornado na variável 'batch_id'\n4. Executar os endpoints de Compliance e Prediction com esse batch_id",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8001",
+      "type": "string"
+    },
+    {
+      "key": "batch_id",
+      "value": "1",
+      "type": "string",
+      "description": "ID do batch retornado após upload. Atualize após cada upload."
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Health Check",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Status ok', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.status).to.equal('ok');",
+                  "    pm.expect(json.service).to.equal('BiotecPredict');",
+                  "    pm.expect(json).to.have.property('version');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/health",
+            "description": "Verifica saúde da API. Deve retornar status ok com nome e versão do serviço."
+          }
+        },
+        {
+          "name": "Root Endpoint",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Has message', () => {",
+                  "    pm.expect(pm.response.json()).to.have.property('message');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/",
+            "description": "Endpoint raiz da API."
+          }
+        },
+        {
+          "name": "Swagger Docs",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Swagger acessível (200)', () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/docs",
+            "description": "Verifica que a documentação Swagger está acessível."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Upload CSV",
+      "item": [
+        {
+          "name": "Upload CSV Válido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "",
+                  "pm.test('Resposta contém id do batch', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('id');",
+                  "    pm.expect(json.id).to.be.a('number');",
+                  "    pm.expect(json.id).to.be.above(0);",
+                  "    // Salva batch_id para próximos requests",
+                  "    pm.collectionVariables.set('batch_id', json.id);",
+                  "    console.log('batch_id salvo:', json.id);",
+                  "});",
+                  "",
+                  "pm.test('Status é COMPLETED', () => {",
+                  "    pm.expect(pm.response.json().status).to.equal('COMPLETED');",
+                  "});",
+                  "",
+                  "pm.test('upload_date presente', () => {",
+                  "    pm.expect(pm.response.json()).to.have.property('upload_date');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/v1/upload",
+            "description": "Faz upload de um arquivo CSV válido com dados de sensores biofarmacêuticos.\n\nApós sucesso, o batch_id é automaticamente salvo na variável de coleção para uso nos próximos requests.",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": [],
+                  "description": "Selecione um arquivo CSV com colunas: temperature, ph, dissolved_oxygen, pressure, agitator_speed"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Upload CSV — Arquivo Vazio (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Erro descritivo', () => {",
+                  "    pm.expect(pm.response.json()).to.have.property('detail');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/v1/upload",
+            "description": "Testa rejeição de arquivo vazio. Deve retornar HTTP 400 com mensagem de erro.",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": [],
+                  "description": "Envie um arquivo CSV vazio (0 bytes)"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Upload CSV — Colunas Faltando (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400', () => pm.response.to.have.status(400));",
+                  "pm.test('detail presente', () => {",
+                  "    pm.expect(pm.response.json()).to.have.property('detail');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/v1/upload",
+            "description": "CSV sem todas as colunas obrigatórias deve retornar 400.",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": [],
+                  "description": "CSV com apenas temperature e ph (faltam dissolved_oxygen, pressure, agitator_speed)"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Batches",
+      "item": [
+        {
+          "name": "Listar Todos os Batches",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Resposta é array', () => {",
+                  "    pm.expect(pm.response.json()).to.be.an('array');",
+                  "});",
+                  "pm.test('Cada batch tem id e status', () => {",
+                  "    const batches = pm.response.json();",
+                  "    if (batches.length > 0) {",
+                  "        pm.expect(batches[0]).to.have.property('id');",
+                  "        pm.expect(batches[0]).to.have.property('status');",
+                  "        pm.expect(batches[0]).to.have.property('upload_date');",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/v1/batches",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "batches"],
+              "query": [
+                { "key": "skip", "value": "0", "disabled": true },
+                { "key": "limit", "value": "100", "disabled": true }
+              ]
+            },
+            "description": "Lista todos os batches. Suporta skip e limit para paginação."
+          }
+        },
+        {
+          "name": "Listar Batches — Com Paginação",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Retorna no máximo limit itens', () => {",
+                  "    const data = pm.response.json();",
+                  "    pm.expect(data.length).to.be.at.most(2);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/v1/batches?skip=0&limit=2",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "batches"],
+              "query": [
+                { "key": "skip", "value": "0" },
+                { "key": "limit", "value": "2" }
+              ]
+            },
+            "description": "Testa paginação com limit=2."
+          }
+        },
+        {
+          "name": "Detalhe do Batch",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('ID corresponde', () => {",
+                  "    const data = pm.response.json();",
+                  "    pm.expect(data.id).to.equal(parseInt(pm.collectionVariables.get('batch_id')));",
+                  "});",
+                  "pm.test('Status COMPLETED', () => {",
+                  "    pm.expect(pm.response.json().status).to.equal('COMPLETED');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/v1/batch/{{batch_id}}",
+            "description": "Retorna detalhes de um batch específico pelo ID."
+          }
+        },
+        {
+          "name": "Detalhe do Batch — Não Encontrado (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 404', () => pm.response.to.have.status(404));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/v1/batch/99999",
+            "description": "ID inexistente deve retornar 404."
+          }
+        },
+        {
+          "name": "Sensores do Batch",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Estrutura correta', () => {",
+                  "    const data = pm.response.json();",
+                  "    pm.expect(data).to.have.property('batch_id');",
+                  "    pm.expect(data).to.have.property('count');",
+                  "    pm.expect(data).to.have.property('readings');",
+                  "    pm.expect(data.readings).to.be.an('array');",
+                  "    pm.expect(data.count).to.equal(data.readings.length);",
+                  "});",
+                  "pm.test('Leituras têm todos os campos de sensor', () => {",
+                  "    const readings = pm.response.json().readings;",
+                  "    if (readings.length > 0) {",
+                  "        const r = readings[0];",
+                  "        ['temperature', 'ph', 'dissolved_oxygen', 'pressure', 'agitator_speed'].forEach(f => {",
+                  "            pm.expect(r).to.have.property(f);",
+                  "        });",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/v1/batch/{{batch_id}}/sensors",
+            "description": "Lista todas as leituras de sensores de um batch."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Compliance Score",
+      "item": [
+        {
+          "name": "Compliance Score do Batch",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "",
+                  "pm.test('Campos obrigatórios presentes', () => {",
+                  "    const data = pm.response.json();",
+                  "    pm.expect(data).to.have.property('batch_id');",
+                  "    pm.expect(data).to.have.property('compliance_score');",
+                  "    pm.expect(data).to.have.property('classification');",
+                  "    pm.expect(data).to.have.property('sensor_metrics');",
+                  "});",
+                  "",
+                  "pm.test('Score entre 0 e 100', () => {",
+                  "    const score = pm.response.json().compliance_score;",
+                  "    pm.expect(score).to.be.at.least(0);",
+                  "    pm.expect(score).to.be.at.most(100);",
+                  "});",
+                  "",
+                  "pm.test('Classificação válida', () => {",
+                  "    const cls = pm.response.json().classification;",
+                  "    pm.expect(['ACCEPTABLE', 'WARNING', 'CRITICAL']).to.include(cls);",
+                  "});",
+                  "",
+                  "pm.test('sensor_metrics tem todos os sensores', () => {",
+                  "    const metrics = pm.response.json().sensor_metrics;",
+                  "    ['temperature', 'ph', 'dissolved_oxygen', 'pressure', 'agitator_speed'].forEach(s => {",
+                  "        pm.expect(metrics).to.have.property(s);",
+                  "    });",
+                  "});",
+                  "",
+                  "pm.test('Métricas de sensor têm average, min, max', () => {",
+                  "    const temp = pm.response.json().sensor_metrics.temperature;",
+                  "    pm.expect(temp).to.have.property('average');",
+                  "    pm.expect(temp).to.have.property('min');",
+                  "    pm.expect(temp).to.have.property('max');",
+                  "    pm.expect(temp).to.have.property('ideal_min');",
+                  "    pm.expect(temp).to.have.property('ideal_max');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/v1/compliance/{{batch_id}}",
+            "description": "Calcula Manufacturing Compliance Score para o batch.\n\nRetorna:\n- compliance_score: 0-100\n- classification: ACCEPTABLE (≥80), WARNING (60-79), CRITICAL (<60)\n- sensor_metrics: métricas detalhadas por sensor"
+          }
+        },
+        {
+          "name": "Compliance — Batch Não Encontrado (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 404', () => pm.response.to.have.status(404));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/v1/compliance/99999"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Predição de Risco",
+      "item": [
+        {
+          "name": "Predição de Risco do Batch",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "",
+                  "pm.test('Campos obrigatórios presentes', () => {",
+                  "    const data = pm.response.json();",
+                  "    pm.expect(data).to.have.property('batch_id');",
+                  "    pm.expect(data).to.have.property('risk_prediction');",
+                  "    pm.expect(data).to.have.property('confidence_score');",
+                  "    pm.expect(data).to.have.property('interpretation');",
+                  "    pm.expect(data).to.have.property('recommendations');",
+                  "});",
+                  "",
+                  "pm.test('risk_prediction é valor válido', () => {",
+                  "    const risk = pm.response.json().risk_prediction;",
+                  "    pm.expect(['LOW_RISK', 'MEDIUM_RISK', 'HIGH_RISK']).to.include(risk);",
+                  "});",
+                  "",
+                  "pm.test('confidence_score entre 0 e 1', () => {",
+                  "    const conf = pm.response.json().confidence_score;",
+                  "    pm.expect(conf).to.be.at.least(0);",
+                  "    pm.expect(conf).to.be.at.most(1);",
+                  "});",
+                  "",
+                  "pm.test('recommendations é array', () => {",
+                  "    pm.expect(pm.response.json().recommendations).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/v1/prediction/{{batch_id}}",
+            "description": "Obtém predição de risco via RandomForestClassifier.\n\nRetorna:\n- risk_prediction: LOW_RISK | MEDIUM_RISK | HIGH_RISK\n- confidence_score: 0.0–1.0\n- interpretation: descrição do risco\n- recommendations: lista de ações recomendadas"
+          }
+        },
+        {
+          "name": "Predição — Batch Não Encontrado (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 404', () => pm.response.to.have.status(404));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/v1/prediction/99999"
+          }
+        },
+        {
+          "name": "Predição Direta (POST /predict)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('risk_prediction presente e válido', () => {",
+                  "    const risk = pm.response.json().risk_prediction;",
+                  "    pm.expect(['LOW_RISK', 'MEDIUM_RISK', 'HIGH_RISK']).to.include(risk);",
+                  "});",
+                  "pm.test('confidence_score entre 0 e 1', () => {",
+                  "    const conf = pm.response.json().confidence_score;",
+                  "    pm.expect(conf).to.be.at.least(0).and.at.most(1);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/v1/predict",
+            "description": "Predição direta sem necessidade de CSV. Fornece as features do sensor diretamente.",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"temperature\": 25.0,\n  \"ph\": 7.0,\n  \"dissolved_oxygen\": 85.0,\n  \"pressure\": 5.0,\n  \"agitator_speed\": 260.0\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "ML Model",
+      "item": [
+        {
+          "name": "Informações do Modelo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('model_type presente', () => {",
+                  "    pm.expect(pm.response.json()).to.have.property('model_type');",
+                  "});",
+                  "pm.test('features lista com 5 elementos', () => {",
+                  "    const features = pm.response.json().features;",
+                  "    pm.expect(features).to.be.an('array').with.lengthOf(5);",
+                  "    pm.expect(features).to.include('temperature');",
+                  "    pm.expect(features).to.include('ph');",
+                  "    pm.expect(features).to.include('dissolved_oxygen');",
+                  "    pm.expect(features).to.include('pressure');",
+                  "    pm.expect(features).to.include('agitator_speed');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/v1/model/info",
+            "description": "Retorna metadados do modelo RandomForestClassifier: tipo, features, classes de risco e importância das features."
+          }
+        }
+      ]
+    }
+  ]
+}

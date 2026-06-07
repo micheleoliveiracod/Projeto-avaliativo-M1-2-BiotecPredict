@@ -1,0 +1,41 @@
+name: biotecpredict
+
+services:
+  backend:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.backend
+    container_name: biotecpredict-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - biotecpredict_data:/app/data
+      - biotecpredict_models:/app/backend/ml/models
+    environment:
+      - DATABASE_URL=sqlite:///./data/biotecpredict.db
+      - ENVIRONMENT=production
+    restart: unless-stopped
+    networks:
+      - biotecpredict-net
+
+  frontend:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.frontend
+    container_name: biotecpredict-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - biotecpredict-net
+
+volumes:
+  biotecpredict_data:
+  biotecpredict_models:
+
+networks:
+  biotecpredict-net:
+    driver: bridge

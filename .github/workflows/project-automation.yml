@@ -1,0 +1,133 @@
+name: Project Automation
+
+on:
+  issues:
+    types: [opened, reopened, closed]
+  pull_request:
+    types: [opened, reopened, closed, converted_to_draft, ready_for_review]
+
+env:
+  PROJECT_OWNER: micheleoliveiracod
+  PROJECT_NUMBER: 7
+  PROJECT_URL: https://github.com/users/micheleoliveiracod/projects/7
+  STATUS_FIELD: Status
+
+permissions:
+  contents: read
+  issues: read
+  pull-requests: read
+
+jobs:
+  add-to-project:
+    name: Add Issue/PR to Project
+    runs-on: ubuntu-latest
+    if: github.event.action == 'opened'
+    steps:
+      - name: Add to project
+        continue-on-error: true
+        uses: actions/add-to-project@v0.5.0
+        with:
+          project-url: ${{ env.PROJECT_URL }}
+          github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
+
+  move-card:
+    name: Move Card to Matching Column
+    runs-on: ubuntu-latest
+    needs: add-to-project
+    # roda sempre que o status do board deveria mudar para uma coluna que o
+    # GitHub não move sozinho (Sprint In Progress / In Review); fechamentos e
+    # reabertura de issues já são tratados pelos workflows nativos do Projects
+    if: |
+      always() &&
+      (github.event_name == 'pull_request' || (github.event_name == 'issues' && github.event.action == 'reopened'))
+    steps:
+      - name: Update Status field via GraphQL
+        continue-on-error: true
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
+          script: |
+            const owner = process.env.PROJECT_OWNER;
+            const number = parseInt(process.env.PROJECT_NUMBER, 10);
+            const fieldName = process.env.STATUS_FIELD;
+
+            const content = context.payload.pull_request || context.payload.issue;
+            const action = context.payload.action;
+
+            let targetStatus = null;
+            if (context.eventName === 'issues' && action === 'reopened') {
+              targetStatus = 'Todo';
+            } else if (context.eventName === 'pull_request') {
+              if (action === 'opened' || action === 'reopened') {
+                targetStatus = content.draft ? 'Sprint In Progress' : 'In Review';
+              } else if (action === 'converted_to_draft') {
+                targetStatus = 'Sprint In Progress';
+              } else if (action === 'ready_for_review') {
+                targetStatus = 'In Review';
+              }
+            }
+            if (!targetStatus) {
+              core.info(`Nenhuma transição mapeada para ${context.eventName}.${action} — nada a fazer.`);
+              return;
+            }
+
+            const { user } = await github.graphql(
+              `query($login: String!, $number: Int!, $field: String!) {
+                user(login: $login) {
+                  projectV2(number: $number) {
+                    id
+                    field(name: $field) {
+                      ... on ProjectV2SingleSelectField { id options { id name } }
+                    }
+                  }
+                }
+              }`,
+              { login: owner, number, field: fieldName }
+            );
+
+            const project = user.projectV2;
+            const option = project.field.options.find((o) => o.name === targetStatus);
+            if (!option) {
+              core.warning(`Coluna "${targetStatus}" não existe no campo "${fieldName}" do board.`);
+              return;
+            }
+
+            // O item pode levar alguns segundos para aparecer no board após o
+            // job add-to-project rodar — tenta algumas vezes com espera curta.
+            let item = null;
+            for (let attempt = 0; attempt < 4 && !item; attempt += 1) {
+              if (attempt > 0) {
+                await new Promise((resolve) => setTimeout(resolve, 3000));
+              }
+              const result = await github.graphql(
+                `query($id: ID!) {
+                  node(id: $id) {
+                    ... on Issue { projectItems(first: 20) { nodes { id project { number } } } }
+                    ... on PullRequest { projectItems(first: 20) { nodes { id project { number } } } }
+                  }
+                }`,
+                { id: content.node_id }
+              );
+              item = result.node.projectItems.nodes.find((n) => n.project.number === number);
+            }
+
+            if (!item) {
+              core.warning(`#${content.number} não foi encontrado no board — movimentação ignorada.`);
+              return;
+            }
+
+            await github.graphql(
+              `mutation($project: ID!, $item: ID!, $field: ID!, $option: String!) {
+                updateProjectV2ItemFieldValue(input: {
+                  projectId: $project
+                  itemId: $item
+                  fieldId: $field
+                  value: { singleSelectOptionId: $option }
+                }) {
+                  projectV2Item { id }
+                }
+              }`,
+              { project: project.id, item: item.id, field: project.field.id, option: option.id }
+            );
+
+            core.info(`#${content.number} movido para "${targetStatus}".`);
