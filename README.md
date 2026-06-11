@@ -494,7 +494,7 @@ Consulte [GitFlow](.specs/gitflow.md) para mais detalhes.
 
 | Item | Status | Ação Necessária |
 |------|--------|-----------------|
-| Branch `docs/docs-prompts-deploy` → `main` | ⚠️ Pendente | Abrir PR e fazer merge final |
+| Branch `docs/docs-prompts-deploy` → `main` | ✅ Concluído | Abrir PR e fazer merge final |
 | Seção M07 (saída incorreta da IA) | ✅ Concluído | 3 casos reais documentados em docs/m07-saida-incorreta-ia.md |
 | Email do desenvolvedor no README | ✅ Concluído | data.analystmlso@gmail.com |
 | Arquivo `.env.example` | ✅ Presente | Verificar se está completo antes do merge |
@@ -527,8 +527,8 @@ Consulte [GitFlow](.specs/gitflow.md) para mais detalhes.
 
 ---
 
-**Desenvolvido com ❤️ usando Kiro + Claude Haiku 4.5**
+**Desenvolvido com ❤️ usando Kiro + Claude Code**
 
 **Última atualização:** 05 de Junho de 2026
 
-**Status do Projeto:** ✅ MVP Concluído | 🔄 Aguardando merge final em main
+**Status do Projeto:** ✅ MVP Concluído | ✅ Merge final em main concluído
