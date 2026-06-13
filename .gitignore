@@ -53,4 +53,7 @@ htmlcov/
 .kiro/reports/
 # .kiro/prompt-logs/ - VERSIONADO: Logs são versionados no Git para rastreabilidade completa (ver docs/prompt-logging.md)
 
+# Arquivos pessoais/curso
+*.pdf
+
 
