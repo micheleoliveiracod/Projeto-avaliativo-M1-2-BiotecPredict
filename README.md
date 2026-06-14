@@ -460,7 +460,7 @@ A IA (Claude Sonnet 4.6) gerou código com erros lógicos em três pontos do sis
 
 ### 📄 Licença do Projeto
 
-Este projeto está licenciado sob a **MIT License**.
+Este projeto está licenciado sob a **Apache License 2.0**.
 
 ## 🤝 Contribuindo
 
@@ -488,7 +488,7 @@ Consulte [GitFlow](.specs/gitflow.md) para mais detalhes.
 | M07 | Caso documentado de saída incorreta da IA | ✅ Completo | 3 casos reais documentados em [docs/m07-saida-incorreta-ia.md](docs/m07-saida-incorreta-ia.md) |
 | M08 | Melhorias futuras | ✅ Completo | Roadmap em 4 fases |
 | M09 | Link do vídeo no YouTube | ✅ Completo | https://youtu.be/9Pax-hNaamo |
-| M10 | LICENSE | ✅ Completo | MIT License |
+| M10 | LICENSE | ✅ Completo | Apache License 2.0 |
 
 ### Pendências Técnicas
 
