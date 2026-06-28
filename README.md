@@ -85,7 +85,32 @@ O BiotecPredict foi desenvolvido com suporte completo de IA em todas as etapas d
 | **Validação** | Análise de qualidade | Kiro valida código, testes, cobertura |
 | **Rastreabilidade** | Logging de prompts | Kiro registra todos os prompts em `.kiro/prompt-logs/` |
 
-#### 2. **Claude Haiku 4.5 - Modelo de IA**
+#### 2. **Claude Code - Agente de Engenharia de Software**
+
+**O que é:** CLI e agente autônomo da Anthropic que opera diretamente no terminal/IDE, com acesso completo ao sistema de arquivos, git e ferramentas de desenvolvimento.
+
+**Modelo de IA:** Claude Sonnet 4.6 (modelo avançado para engenharia de software)
+
+**Etapas de Uso:**
+
+| Etapa | Uso de IA | Descrição |
+|-------|-----------|-----------|
+| **Implementação** | Geração e refatoração de código | Claude Code edita, cria e refatora código com contexto completo do projeto |
+| **Debugging** | Análise e correção de bugs | Claude Code identifica root causes e aplica correções |
+| **Testes** | Geração e execução de testes | Claude Code gera testes e valida resultados |
+| **Code Review** | Revisão de código | Claude Code analisa diffs, identifica bugs e sugere melhorias |
+| **Documentação** | Geração e atualização de docs | Claude Code gera e mantém README, docstrings e documentação técnica |
+| **Git** | Gerenciamento de versionamento | Claude Code cria commits, branches e PRs |
+
+**Capacidades Utilizadas:**
+- ✅ Edição multi-arquivo com contexto completo do codebase
+- ✅ Execução de comandos shell (build, testes, lint)
+- ✅ Análise e correção de bugs em tempo real
+- ✅ Code review automatizado com diferentes níveis de profundidade
+- ✅ Gerenciamento de git (commits, branches, PRs)
+- ✅ Integração com MCP servers (Figma, Notion, etc.)
+
+#### 3. **Claude Haiku 4.5 - Modelo de IA**
 
 **Características:**
 - Modelo otimizado para velocidade e eficiência
@@ -101,7 +126,7 @@ O BiotecPredict foi desenvolvido com suporte completo de IA em todas as etapas d
 - ✅ Análise crítica de qualidade
 - ✅ Sugestões de otimização
 
-#### 3. **GitHub Actions - Automação com IA**
+#### 4. **GitHub Actions - Automação com IA**
 
 **Workflows com Suporte de IA:**
 
@@ -113,7 +138,7 @@ O BiotecPredict foi desenvolvido com suporte completo de IA em todas as etapas d
 | **AI Test Generation** | Geração de testes com IA | Kiro gera testes, GitHub Actions valida |
 | **Project Automation** | Automação de board do projeto | Kiro configura, GitHub Actions gerencia |
 
-#### 4. **Hooks do Kiro - Automação de Eventos**
+#### 5. **Hooks do Kiro - Automação de Eventos**
 
 **Hooks Implementados:**
 
@@ -286,6 +311,28 @@ Aguarde 20-30 segundos, depois acesse:
 | **API** | http://localhost:8000/api |
 | **Swagger** | http://localhost:8000/docs |
 | **ReDoc** | http://localhost:8000/redoc |
+
+---
+
+## 📸 Sistema em Funcionamento
+
+### Dashboard — Análise de Risco por Batch
+
+**Low Risk — Batch dentro das especificações:**
+
+![Low Risk](docs/images/low-risk.png)
+
+**Medium Risk — Batch com desvios moderados:**
+
+![Medium Risk](docs/images/medium-risk.png)
+
+**High Risk — Batch com desvios críticos:**
+
+![High Risk](docs/images/high-risk.png)
+
+### Histórico de Batches
+
+![Histórico de Batches](docs/images/historico-batches.png)
 
 ---
 
@@ -519,7 +566,7 @@ Consulte [GitFlow](.specs/gitflow.md) para mais detalhes.
 
 ---
 
-## � Agradecimentos
+## ⭐ Agradecimentos
 
 - **SCTEC e SENAI** - Programa de IA para DEVs
 - **Kaggle** - Dataset de Biopharmaceutical Manufacturing
@@ -527,8 +574,8 @@ Consulte [GitFlow](.specs/gitflow.md) para mais detalhes.
 
 ---
 
-**Desenvolvido com ❤️ usando Kiro + Claude Code**
+**Desenvolvido com 💜🪻**
 
-**Última atualização:** 05 de Junho de 2026
+**Última atualização:** 28 de Junho de 2026
 
 **Status do Projeto:** ✅ MVP Concluído | ✅ Merge final em main concluído
