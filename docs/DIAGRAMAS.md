@@ -23,9 +23,9 @@ graph TB
     subgraph BE ["Backend — FastAPI + Python (:8001)"]
         MW[Middleware CORS]
         subgraph ROUTES ["Rotas"]
-            R_BATCH[/batch]
-            R_COMP[/compliance]
-            R_PRED[/prediction]
+            R_BATCH["/batch"]
+            R_COMP["/compliance"]
+            R_PRED["/prediction"]
         end
         subgraph SERVICES ["Serviços"]
             S_BATCH[BatchService]
