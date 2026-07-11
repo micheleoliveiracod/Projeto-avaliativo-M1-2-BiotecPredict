@@ -49,8 +49,10 @@ graph TB
         PKL2[(scaler.pkl)]
     end
 
-    Client --> FE
-    FE --> PROXY
+    Client --> ROUTER
+    ROUTER --> LAYOUT
+    LAYOUT --> SVC_API
+    SVC_API --> PROXY
     PROXY --> MW
     MW --> ROUTES
     ROUTES --> SERVICES
@@ -170,24 +172,26 @@ flowchart TD
 ## 5. Pipeline de Machine Learning
 
 ```mermaid
-flowchart LR
+flowchart TB
     subgraph TRAIN ["Treino (offline)"]
-        DS[(Dataset Kaggle)] --> FE[Feature Engineering]
-        FE --> SC_FIT[StandardScaler.fit]
-        SC_FIT --> RF_FIT[RandomForest.fit\nn_estimators=100]
-        RF_FIT --> EVAL{Acurácia ≥ 80%?}
+        direction LR
+        DS[(Dataset Kaggle)] --> FEAT[Feature Engineering]
+        FEAT --> SC_FIT[StandardScaler.fit]
+        SC_FIT --> RF_FIT["RandomForest.fit\nn_estimators=100"]
+        RF_FIT --> EVAL{"Acurácia ≥ 80%?"}
         EVAL -- Não --> RF_FIT
         EVAL -- Sim --> SAVE_SC[scaler.pkl]
         EVAL -- Sim --> SAVE_RF[risk_predictor.pkl]
     end
 
     subgraph INFER ["Inferência (online)"]
+        direction LR
         BATCH[(Batch Readings)] --> AGGR[Calcular médias]
         AGGR --> LOAD_SC[Carregar scaler.pkl]
         LOAD_SC --> TRANSFORM[scaler.transform]
         TRANSFORM --> LOAD_RF[Carregar risk_predictor.pkl]
         LOAD_RF --> PRED[predict + predict_proba]
-        PRED --> OUT([LOW_RISK\nMEDIUM_RISK\nHIGH_RISK\n+ confidence])
+        PRED --> OUT(["LOW_RISK\nMEDIUM_RISK\nHIGH_RISK\n+ confidence"])
     end
 
     SAVE_SC -.->|deploy| LOAD_SC
