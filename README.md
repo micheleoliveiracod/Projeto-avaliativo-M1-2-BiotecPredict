@@ -316,6 +316,12 @@ Aguarde 20-30 segundos, depois acesse:
 
 ## 📸 Sistema em Funcionamento
 
+### Upload de CSV
+
+**Tela de upload — envio do arquivo CSV com as leituras do batch:**
+
+![Upload CSV](docs/images/upload-csv.png)
+
 ### Dashboard — Análise de Risco por Batch
 
 **Low Risk — Batch dentro das especificações:**
