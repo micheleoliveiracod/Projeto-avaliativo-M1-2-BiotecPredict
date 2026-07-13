@@ -163,8 +163,8 @@ flowchart TD
 
     AVG_SCORE --> CLASS{Score?}
     CLASS -- "≥ 80" --> ACC[ACCEPTABLE]
-    CLASS -- "60–79" --> WARN[WARNING]
-    CLASS -- "< 60" --> CRIT[CRITICAL]
+    CLASS -- "45–79" --> WARN[WARNING]
+    CLASS -- "< 45" --> CRIT[CRITICAL]
 ```
 
 ---

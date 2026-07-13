@@ -87,8 +87,8 @@ O componente utiliza **TailwindCSS** através de CSS Modules (`Dashboard.module.
 - Score 0-100 com cor indicativa
 - Classificação automática:
   - 80-100: ACCEPTABLE (verde)
-  - 60-79: WARNING (amarelo)
-  - 0-59: CRITICAL (vermelho)
+  - 45-79: WARNING (amarelo)
+  - 0-44: CRITICAL (vermelho)
 
 ### Risk Prediction
 - Predição: LOW RISK, MEDIUM RISK, HIGH RISK

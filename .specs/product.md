@@ -93,8 +93,8 @@ O score é calculado com base em regras determinísticas que avaliam cada variá
 | Score | Classificação | Ação |
 |---|---|---|
 | 80 – 100 | ACCEPTABLE | Processo conforme |
-| 60 – 79 | WARNING | Atenção necessária |
-| 0 – 59 | CRITICAL | Intervenção imediata |
+| 45 – 79 | WARNING | Atenção necessária |
+| 0 – 44 | CRITICAL | Intervenção imediata |
 
 ---
 
