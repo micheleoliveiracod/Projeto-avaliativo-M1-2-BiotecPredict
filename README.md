@@ -564,24 +564,18 @@ Consulte [GitFlow](.specs/gitflow.md) para mais detalhes.
 
 ---
 
-## 👨‍💻 Desenvolvedor
-
-**Michele Oliveira**
-- GitHub: [@micheleoliveiracod](https://github.com/micheleoliveiracod)
-- Email: [data.analystmlso@gmail.com](mailto:data.analystmlso@gmail.com)
-
----
-
 ## ⭐ Agradecimentos
 
 - **SCTEC e SENAI** - Programa de IA para DEVs
 - **Kaggle** - Dataset de Biopharmaceutical Manufacturing
 - **Comunidade Open Source** - Ferramentas e bibliotecas utilizadas
 
----
+## 👨‍💻 Desenvolvedor
 
-**Desenvolvido com 💜🪻**
+**Desenvolvido com 💜 por Michele Oliveira**
+- GitHub: [@micheleoliveiracod](https://github.com/micheleoliveiracod)
+- Email: [data.analystmlso@gmail.com](mailto:data.analystmlso@gmail.com)
 
-**Última atualização:** 28 de Junho de 2026
+**Última atualização:**  13 de Julho de 2026
 
 **Status do Projeto:** ✅ MVP Concluído | ✅ Merge final em main concluído

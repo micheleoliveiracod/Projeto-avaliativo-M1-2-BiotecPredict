@@ -83,7 +83,7 @@ const Dashboard: React.FC<DashboardProps> = ({ refreshInterval = 30000 }) => {
    */
   const classifyComplianceScore = (score: number): 'ACCEPTABLE' | 'WARNING' | 'CRITICAL' => {
     if (score >= 80) return 'ACCEPTABLE'
-    if (score >= 60) return 'WARNING'
+    if (score >= 45) return 'WARNING'
     return 'CRITICAL'
   }
 
@@ -177,9 +177,9 @@ const Dashboard: React.FC<DashboardProps> = ({ refreshInterval = 30000 }) => {
           case 'acceptable':
             return score >= 80
           case 'warning':
-            return score >= 60 && score < 80
+            return score >= 45 && score < 80
           case 'critical':
-            return score < 60
+            return score < 45
           default:
             return true
         }
@@ -520,8 +520,8 @@ const Dashboard: React.FC<DashboardProps> = ({ refreshInterval = 30000 }) => {
             >
               <option value="all">Todos</option>
               <option value="acceptable">Aceitável (80-100)</option>
-              <option value="warning">Aviso (60-79)</option>
-              <option value="critical">Crítico (0-59)</option>
+              <option value="warning">Aviso (45-79)</option>
+              <option value="critical">Crítico (0-44)</option>
             </select>
           </div>
 

@@ -48,8 +48,8 @@ class ComplianceService:
             Tupla (score_0_100, classificacao)
             Classificações:
             - ACCEPTABLE (80-100): Processo conforme
-            - WARNING (60-79): Atenção necessária
-            - CRITICAL (0-59): Intervenção imediata
+            - WARNING (45-79): Atenção necessária
+            - CRITICAL (0-44): Intervenção imediata
         """
         if not sensor_readings:
             return 0.0, "CRITICAL"
