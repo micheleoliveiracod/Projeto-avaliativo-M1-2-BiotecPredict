@@ -160,7 +160,7 @@ describe('Dashboard Component', () => {
       })
     })
 
-    it('should classify score as WARNING (60-79)', async () => {
+    it('should classify score as WARNING (45-79)', async () => {
       const mockBatch = {
         id: 'batch-1',
         upload_date: '2026-05-27T10:00:00',
@@ -195,11 +195,11 @@ describe('Dashboard Component', () => {
       })
     })
 
-    it('should classify score as CRITICAL (0-59)', async () => {
+    it('should classify score as CRITICAL (0-44)', async () => {
       const mockBatch = {
         id: 'batch-1',
         upload_date: '2026-05-27T10:00:00',
-        compliance_score: 45,
+        compliance_score: 44,
         risk_prediction: 'HIGH_RISK',
         confidence_score: 0.85,
         status: 'COMPLETED'
@@ -212,7 +212,7 @@ describe('Dashboard Component', () => {
         })
         .mockResolvedValueOnce({
           ok: true,
-          json: async () => ({ compliance_score: 45 })
+          json: async () => ({ compliance_score: 44 })
         })
         .mockResolvedValueOnce({
           ok: true,

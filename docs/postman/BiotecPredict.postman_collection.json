@@ -418,7 +418,7 @@
           "request": {
             "method": "GET",
             "url": "{{base_url}}/api/v1/compliance/{{batch_id}}",
-            "description": "Calcula Manufacturing Compliance Score para o batch.\n\nRetorna:\n- compliance_score: 0-100\n- classification: ACCEPTABLE (≥80), WARNING (60-79), CRITICAL (<60)\n- sensor_metrics: métricas detalhadas por sensor"
+            "description": "Calcula Manufacturing Compliance Score para o batch.\n\nRetorna:\n- compliance_score: 0-100\n- classification: ACCEPTABLE (≥80), WARNING (45-79), CRITICAL (<45)\n- sensor_metrics: métricas detalhadas por sensor"
           }
         },
         {
