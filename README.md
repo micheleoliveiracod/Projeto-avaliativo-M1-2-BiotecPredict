@@ -470,17 +470,17 @@ A IA (Claude Sonnet 4.6) gerou código com erros lógicos em três pontos do sis
 #### Fase 2: Integração em Tempo Real
 - [ ] Integração com sistemas SCADA
 - [ ] Dados em tempo real (não apenas batch)
-- [ ] Alertas por email/SMS
 - [ ] Dashboard em tempo real
+- [ ] Alertas por email/SMS
+- [ ] Análise de causa raiz de falhas com agente de IA
 
 #### Fase 3: Modelos Avançados
 - [ ] Detecção de anomalias com Isolation Forest
 - [ ] Forecasting temporal com ARIMA/Prophet
 - [ ] Modelos avançados (XGBoost, Neural Networks)
-- [ ] Análise de causa raiz de falhas
 
 #### Fase 4: Escalabilidade
-- [ ] Suporte a 1000+ usuários simultâneos
+- [ ] Suporte a 100+ usuários simultâneos
 - [ ] Arquitetura de microserviços
 - [ ] Cache distribuído (Redis)
 - [ ] Message queue (RabbitMQ/Kafka)
@@ -509,23 +509,6 @@ A IA (Claude Sonnet 4.6) gerou código com erros lógicos em três pontos do sis
 
 ---
 
-## M10 — LICENSE
-
-### 📄 Licença do Projeto
-
-Este projeto está licenciado sob a **Apache License 2.0**.
-
-## 🤝 Contribuindo
-
-1. Crie uma branch para sua feature: `git checkout -b feature/sua-feature`
-2. Commit suas mudanças: `git commit -m 'feat: descrição da feature'`
-3. Push para a branch: `git push origin feature/sua-feature`
-4. Abra um Pull Request
-
-Consulte [GitFlow](.specs/gitflow.md) para mais detalhes.
-
----
-
 ## ✅ Checklist Final de Entrega
 
 ### Requisitos Obrigatórios do Projeto Avaliativo
@@ -542,17 +525,6 @@ Consulte [GitFlow](.specs/gitflow.md) para mais detalhes.
 | M08 | Melhorias futuras | ✅ Completo | Roadmap em 4 fases |
 | M09 | Link do vídeo no YouTube | ✅ Completo | https://youtu.be/9Pax-hNaamo |
 | M10 | LICENSE | ✅ Completo | Apache License 2.0 |
-
-### Pendências Técnicas
-
-| Item | Status | Ação Necessária |
-|------|--------|-----------------|
-| Branch `docs/docs-prompts-deploy` → `main` | ✅ Concluído | Abrir PR e fazer merge final |
-| Seção M07 (saída incorreta da IA) | ✅ Concluído | 3 casos reais documentados em docs/m07-saida-incorreta-ia.md |
-| Email do desenvolvedor no README | ✅ Concluído | data.analystmlso@gmail.com |
-| Arquivo `.env.example` | ✅ Presente | Verificar se está completo antes do merge |
-| `biotecpredict.db` no `.gitignore` | ✅ Concluído | Regra `*.db` adicionada ao .gitignore |
-
 ---
 
 ## 📚 Documentação Adicional
@@ -570,6 +542,8 @@ Consulte [GitFlow](.specs/gitflow.md) para mais detalhes.
 - **Kaggle** - Dataset de Biopharmaceutical Manufacturing
 - **Comunidade Open Source** - Ferramentas e bibliotecas utilizadas
 
+---
+
 ## 👨‍💻 Desenvolvedor
 
 **Desenvolvido com 💜 por Michele Oliveira**
@@ -579,3 +553,21 @@ Consulte [GitFlow](.specs/gitflow.md) para mais detalhes.
 **Última atualização:**  13 de Julho de 2026
 
 **Status do Projeto:** ✅ MVP Concluído | ✅ Merge final em main concluído
+
+---
+
+## 🤝 Contribuindo
+
+1. Crie uma branch para sua feature: `git checkout -b feature/sua-feature`
+2. Commit suas mudanças: `git commit -m 'feat: descrição da feature'`
+3. Push para a branch: `git push origin feature/sua-feature`
+4. Abra um Pull Request
+
+Consulte [GitFlow](.specs/gitflow.md) para mais detalhes.
+
+---
+
+## 📄 Licença do Projeto
+
+Este projeto está licenciado sob a **Apache License 2.0**.
+
