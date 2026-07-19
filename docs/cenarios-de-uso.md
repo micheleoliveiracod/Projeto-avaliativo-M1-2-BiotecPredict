@@ -518,3 +518,9 @@ curl -X POST http://localhost:8001/api/v1/upload \
 **Data:** Junho de 2026  
 **Arquivo de referência:** `backend/tests/fixtures/csv/README.md`  
 **Coleção Postman:** `docs/postman/BiotecPredict.postman_collection.json`
+
+> **Simulação para análise de causa-raiz:** os cenários acima usam fixtures de
+> `backend/tests/fixtures/csv/` (treino/validação dos métodos de cálculo do BiotecPredict). Para
+> lotes simulados com causa-raiz fisicamente plausível (pensados para um agente de IA de
+> diagnóstico consumir a saída do BiotecPredict), veja
+> [`datasets/simulacao_causa_raiz/README.md`](../datasets/simulacao_causa_raiz/README.md).
