@@ -20,7 +20,7 @@ import os
 # é sempre definida via variável de ambiente (ver deploy/docker-compose.yml) e
 # sobrepõe este default.
 _BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # backend/db/
-_DEFAULT_DB_PATH = os.path.join(_BASE_DIR, "..", "data", "biotecpredict.db")
+_DEFAULT_DB_PATH = os.path.join(_BASE_DIR, "..", "data", "Biotecpredict.db")
 
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
