@@ -350,4 +350,16 @@ O **Compliance Score** (0 a 100) é que mede a saúde do processo. A **confianç
 - **Compliance Score usa médias:** um batch com valores alternando entre extremos pode ter média aceitável mas operação instável. Analisar também os valores mínimo e máximo de cada sensor via endpoint `/api/v1/batch/{id}/sensors`.
 - **Predição de Risco é treinado com dados sintéticos:** o modelo representa padrões gerais de bioprocessos e pode ter precisão limitada em cenários muito específicos ou com combinações de sensores não representadas no treino.
 - **Ambos os indicadores refletem o momento do upload:** não capturam desvios que ocorram após o envio do arquivo. Para monitoramento contínuo, reenvie o arquivo periodicamente ou integre a API diretamente ao sistema de aquisição de dados.
+
+### 8.1 — Divergências de cálculo confirmadas (2026-07-19), ainda sem correção aplicada
+
+Validando o código real com fixtures dedicadas, foram confirmadas 5 divergências entre
+`ComplianceService` e `MLModel`/`MLService` (não hipóteses — reproduzidas rodando o código):
+ML previsto abaixo do esperado para lotes com 1 ou 3 sensores fora da faixa aceitável, combinação
+WARNING + LOW_RISK no mesmo lote, uma leitura catastrófica mascarada pela média do lote (score
+94.13 · ACCEPTABLE mesmo com 1 leitura de temperatura quase o dobro do limite ideal), e uma
+inconsistência de arredondamento onde o mesmo score exibido "45.0" pode classificar como WARNING
+ou CRITICAL dependendo do valor não arredondado. Detalhes, valores exatos e os CSVs de reprodução
+de cada caso: [`backend/tests/fixtures/csv/README.md`](../backend/tests/fixtures/csv/README.md),
+seção "Bugs de Cálculo Encontrados".
 - **O modelo ML é retreinado do zero a cada inicialização do backend** quando os arquivos `.pkl` não existem: o comportamento pode variar levemente entre deploys. Para resultados reproduzíveis, versione os arquivos `backend/ml/models/risk_predictor.pkl` e `scaler.pkl`.
