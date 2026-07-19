@@ -320,25 +320,25 @@ Aguarde 20-30 segundos, depois acesse:
 
 **Tela de upload — envio do arquivo CSV com as leituras do batch:**
 
-![Upload CSV](docs/images/upload-csv.png)
+![Upload CSV](docs/images/UPLOAD_CSV.png)
 
 ### Dashboard — Análise de Risco por Batch
 
 **Low Risk — Batch dentro das especificações:**
 
-![Low Risk](docs/images/low-risk.png)
+![Low Risk](docs/images/LOW_RISK.png)
 
 **Medium Risk — Batch com desvios moderados:**
 
-![Medium Risk](docs/images/medium-risk.png)
+![Medium Risk](docs/images/MEDIUM_RISK.png)
 
 **High Risk — Batch com desvios críticos:**
 
-![High Risk](docs/images/high-risk.png)
+![High Risk](docs/images/HIGH_RISK.png)
 
 ### Histórico de Batches
 
-![Histórico de Batches](docs/images/historico-batches.png)
+![Histórico de Batches](docs/images/DATABASE.png)
 
 ---
 
@@ -561,7 +561,7 @@ A IA (Claude Sonnet 4.6) gerou código com erros lógicos em três pontos do sis
 - GitHub: [@micheleoliveiracod](https://github.com/micheleoliveiracod)
 - Email: [data.analystmlso@gmail.com](mailto:data.analystmlso@gmail.com)
 
-**Última atualização:**  19 de Julho de 2026
+**Última atualização:**  19 de Julho de 2026 (screenshots atualizados)
 
 **Status do Projeto:** ✅ MVP Concluído | ✅ Merge final em main concluído
 
