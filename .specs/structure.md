@@ -186,7 +186,6 @@ Organização de diretórios: backend Python (processamento, ML e API) e fronten
 │   └── localizacao.md
 │
 ├── .env.example
-├── biotecpredict.db                 # Banco de dados SQLite (gerado em runtime)
 ├── pytest.ini                       # Configuração global do pytest
 ├── README.md
 └── LICENSE
@@ -251,10 +250,21 @@ Persistência de dados.
 
 | Arquivo | Responsabilidade |
 |---|---|
-| `database.py` | Engine SQLite (`sqlite:///./biotecpredict.db`) · `get_db()` · `SessionLocal` · `Base` |
+| `database.py` | Engine SQLite · `get_db()` · `SessionLocal` · `Base` |
 | `repository.py` | `BatchRepository` · `SensorReadingRepository` (pattern Repository) |
 
 > `get_db()` é a única definição usada — importada por todos os routers via `from backend.db.database import get_db`.
+
+**Banco de dados — local único, sem duplicação:**
+
+| Ambiente | Arquivo/URL | Como é definido |
+|---|---|---|
+| Oficial (dev local, sem Docker) | `backend/data/biotecpredict.db` | Default de `database.py`, ancorado em `__file__` (não no cwd de quem roda o processo — evita gerar cópias em lugares diferentes conforme o comando usado para subir o backend) |
+| Oficial (Docker) | `/app/data/biotecpredict.db`, persistido no volume nomeado `biotecpredict_data` | `DATABASE_URL` definida em `deploy/docker-compose.yml` |
+| Teste (pytest) | SQLite **in-memory** (`sqlite:///:memory:`), um por função de teste | `tests/pytest/conftest.py` (`test_engine` fixture) — nunca toca disco, isolado por teste |
+
+`DATABASE_TEST_URL` não existe mais como variável lida pelo código — a suíte de testes nunca usa
+arquivo em disco, então não há um segundo `.db` de teste para manter sincronizado.
 
 ---
 
@@ -277,7 +287,7 @@ Suíte de testes organizada em duas camadas:
 
 | Diretório | Propósito |
 |---|---|
-| `tests/fixtures/csv/` | CSVs compartilhados por pytest, Postman e E2E (10 arquivos, 3 cenários de compliance) |
+| `tests/fixtures/csv/` | CSVs compartilhados por pytest, Postman e E2E, organizados por propósito: `control/` (comportamento correto), `bugs/` (reproduz divergências Compliance × ML conhecidas), `rejected/` (upload deve dar HTTP 400), `performance/` (teste de carga) — ver `tests/fixtures/csv/README.md` |
 | `tests/pytest/conftest.py` | `test_engine` (SQLite in-memory + StaticPool) · `db_session` · `client` (override get_db) |
 | `tests/pytest/integration/test_api_integration.py` | 63 testes de integração — todos os endpoints verificados |
 | `tests/pytest/unit/` | Testes unitários de modelos, schemas, processors, services |

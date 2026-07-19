@@ -183,14 +183,19 @@ Retenção: 30 dias
 
 ### Backup Manual
 
+O banco oficial é único e vive no volume nomeado `biotecpredict_data`, montado em
+`/app/data/biotecpredict.db` dentro do container `biotecpredict-backend` (ver `.specs/structure.md`,
+seção "Banco de dados — local único, sem duplicação").
+
 ```bash
-cp biotecpredict.db backup/biotecpredict-$(date +%Y%m%d-%H%M%S).db
+docker cp biotecpredict-backend:/app/data/biotecpredict.db backup/biotecpredict-$(date +%Y%m%d-%H%M%S).db
 ```
 
 ### Restaurar Backup
 
 ```bash
-cp backup/biotecpredict-YYYYMMDD-HHMMSS.db biotecpredict.db
+docker cp backup/biotecpredict-YYYYMMDD-HHMMSS.db biotecpredict-backend:/app/data/biotecpredict.db
+docker restart biotecpredict-backend
 ```
 
 ---

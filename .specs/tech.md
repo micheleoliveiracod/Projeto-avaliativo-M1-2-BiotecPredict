@@ -169,7 +169,7 @@ app.dependency_overrides[get_db] = override_get_db
 - Localização: `docs/postman/BiotecPredict.postman_collection.json`
 - Variáveis de coleção: `base_url` = `http://localhost:8001`, `batch_id` = `1`
 - O request de Upload salva o `batch_id` automaticamente via test script
-- Fixtures CSV em `backend/tests/fixtures/csv/` (10 arquivos cobrindo casos válidos, warning, critical e inválidos)
+- Fixtures CSV em `backend/tests/fixtures/csv/`, organizadas por propósito em subpastas: `control/` (comportamento correto), `bugs/` (reproduz divergências conhecidas entre `ComplianceService` e `MLModel`), `rejected/` (upload deve dar HTTP 400), `performance/` (teste de carga) — detalhes e valores esperados em `tests/fixtures/csv/README.md`
 
 ---
 

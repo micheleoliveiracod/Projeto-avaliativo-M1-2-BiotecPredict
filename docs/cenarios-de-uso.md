@@ -15,7 +15,7 @@ uvicorn backend.main:app --host 0.0.0.0 --port 8001 --reload
 
 > **Contexto de negócio:** A equipe de manufatura conclui um batch de biofármaco com todas as variáveis de processo dentro dos ranges ideais. A plataforma confirma conformidade e classifica o risco como baixo.
 
-**Arquivo de entrada:** `backend/tests/fixtures/csv/valid_ideal.csv`
+**Arquivo de entrada:** `backend/tests/fixtures/csv/control/valid_ideal.csv`
 
 ```csv
 temperature,ph,dissolved_oxygen,pressure,agitator_speed
@@ -39,7 +39,7 @@ temperature,ph,dissolved_oxygen,pressure,agitator_speed
 
 ```bash
 curl -X POST http://localhost:8001/api/v1/upload \
-  -F "file=@backend/tests/fixtures/csv/valid_ideal.csv"
+  -F "file=@backend/tests/fixtures/csv/control/valid_ideal.csv"
 ```
 
 **Response esperada (HTTP 200):**
@@ -178,7 +178,7 @@ curl http://localhost:8001/api/v1/prediction/1
 
 > **Contexto de negócio:** Sensores detectam desvios severos em todas as variáveis de processo. A temperatura subiu acima do limite aceitável, o pH está fora de controle e o oxigênio dissolvido caiu abaixo do mínimo. A plataforma identifica o batch como crítico e recomenda intervenção imediata.
 
-**Arquivo de entrada:** `backend/tests/fixtures/csv/critical_zone.csv`
+**Arquivo de entrada:** `backend/tests/fixtures/csv/bugs/critical_zone.csv`
 
 ```csv
 temperature,ph,dissolved_oxygen,pressure,agitator_speed
@@ -197,7 +197,7 @@ temperature,ph,dissolved_oxygen,pressure,agitator_speed
 
 ```bash
 curl -X POST http://localhost:8001/api/v1/upload \
-  -F "file=@backend/tests/fixtures/csv/critical_zone.csv"
+  -F "file=@backend/tests/fixtures/csv/bugs/critical_zone.csv"
 ```
 
 **Response esperada (HTTP 200):**
@@ -338,7 +338,7 @@ curl http://localhost:8001/api/v1/prediction/2
 
 > **Contexto de negócio:** Temperatura e pH saem progressivamente da faixa aceitável durante o batch. A plataforma identifica o processo como MEDIUM_RISK e emite alerta — intervenção corretiva pode evitar a perda do produto.
 
-**Arquivo de entrada:** `backend/tests/fixtures/csv/batch_sensor_medium_risk.csv`
+**Arquivo de entrada:** `backend/tests/fixtures/csv/control/batch_sensor_medium_risk.csv`
 
 ```csv
 temperature,ph,dissolved_oxygen,pressure,agitator_speed
@@ -359,7 +359,7 @@ temperature,ph,dissolved_oxygen,pressure,agitator_speed
 
 ```bash
 curl -X POST http://localhost:8000/api/v1/upload \
-  -F "file=@backend/tests/fixtures/csv/batch_sensor_medium_risk.csv"
+  -F "file=@backend/tests/fixtures/csv/control/batch_sensor_medium_risk.csv"
 ```
 
 **Response esperada (HTTP 200):**
@@ -500,7 +500,7 @@ Os testes `TestEndToEndFlow` cobrem os cenários de baixo e alto risco automatic
 
 ```bash
 curl -X POST http://localhost:8001/api/v1/upload \
-  -F "file=@backend/tests/fixtures/csv/invalid_out_of_range.csv"
+  -F "file=@backend/tests/fixtures/csv/rejected/invalid_out_of_range.csv"
 ```
 
 **Response (HTTP 400):**
