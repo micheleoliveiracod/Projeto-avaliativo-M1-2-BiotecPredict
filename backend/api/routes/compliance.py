@@ -42,12 +42,14 @@ def get_compliance_score(batch_id: int, db: Session = Depends(get_db)) -> Dict[s
 
     score, classification = ComplianceService.calculate_compliance_score(readings_data)
     metrics = ComplianceService.get_sensor_metrics(readings_data)
+    anomalies = ComplianceService.detect_anomalous_readings(readings_data)
 
     return {
         "batch_id": batch_id,
         "compliance_score": score,
         "classification": classification,
         "sensor_metrics": metrics,
+        "anomalous_readings": anomalies,
     }
 
 
