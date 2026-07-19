@@ -58,16 +58,28 @@ Organização de diretórios: backend Python (processamento, ML e API) e fronten
 │   │   ├── fixtures/                # Dados de teste compartilhados (pytest · Postman · E2E)
 │   │   │   └── csv/
 │   │   │       ├── README.md                    # Documentação dos cenários de teste
-│   │   │       ├── valid_ideal.csv              # Valores nos ranges ideais → ACCEPTABLE
-│   │   │       ├── valid_acceptable.csv         # Valores aceitáveis mas não ideais
-│   │   │       ├── valid_boundary.csv           # Limites do DataValidator
-│   │   │       ├── valid_large_500rows.csv      # 500 linhas para performance (SLA < 5s)
-│   │   │       ├── warning_zone.csv             # Valores → WARNING compliance
-│   │   │       ├── critical_zone.csv            # Valores → CRITICAL compliance
-│   │   │       ├── invalid_empty.csv            # Arquivo vazio → HTTP 400
-│   │   │       ├── invalid_missing_columns.csv  # Colunas ausentes → HTTP 400
-│   │   │       ├── invalid_wrong_types.csv      # Tipos errados → HTTP 400
-│   │   │       └── invalid_out_of_range.csv     # Fora do range do DataValidator → HTTP 400
+│   │   │       ├── control/                     # Comportamento correto (golden path + fronteiras)
+│   │   │       │   ├── valid_ideal.csv              # Valores nos ranges ideais → ACCEPTABLE
+│   │   │       │   ├── valid_acceptable.csv         # Valores aceitáveis mas não ideais
+│   │   │       │   ├── valid_boundary.csv           # Limites do DataValidator
+│   │   │       │   ├── batch_sensor_low/medium/high_risk.csv  # Lotes grandes (100 linhas) por classe
+│   │   │       │   ├── boundary_acceptable_warning_*.csv      # Fronteira exata 80 (ACCEPTABLE/WARNING)
+│   │   │       │   ├── boundary_warning_critical_*.csv        # Fronteira exata 45 (WARNING/CRITICAL)
+│   │   │       │   └── single/two/four/five_sensors_out.csv   # 1, 2, 4 e 5 sensores fora do aceitável
+│   │   │       ├── bugs/                        # Regressão dos bugs de cálculo corrigidos
+│   │   │       │   ├── warning_zone.csv             # WARNING + LOW_RISK (esperado por design)
+│   │   │       │   ├── critical_zone.csv            # Regressão: ML deveria prever HIGH_RISK
+│   │   │       │   ├── single_sensor_out_temperature.csv    # Regressão: ML deveria prever MEDIUM_RISK
+│   │   │       │   ├── three_sensors_out.csv        # Regressão: ML deveria prever HIGH_RISK
+│   │   │       │   ├── outlier_masked_by_average.csv        # Regressão: outlier isolado mascarado pela média
+│   │   │       │   └── rounding_boundary_inconsistency.csv  # Regressão: score "45.0" com classificação inconsistente
+│   │   │       ├── performance/
+│   │   │       │   └── valid_large_500rows.csv      # 500 linhas para performance (SLA < 5s)
+│   │   │       └── rejected/                    # Upload deve dar HTTP 400
+│   │   │           ├── invalid_empty.csv            # Arquivo vazio
+│   │   │           ├── invalid_missing_columns.csv  # Colunas ausentes
+│   │   │           ├── invalid_wrong_types.csv       # Tipos errados
+│   │   │           └── invalid_out_of_range.csv      # Fora do range do DataValidator
 │   │   └── pytest/
 │   │       ├── __init__.py
 │   │       ├── conftest.py          # Fixtures: test_engine (StaticPool) · db_session · client

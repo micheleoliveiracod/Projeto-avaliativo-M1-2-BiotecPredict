@@ -622,8 +622,8 @@ const Dashboard: React.FC<DashboardProps> = ({ refreshInterval = 30000 }) => {
       {/* Disclaimer */}
       <div className="disclaimer">
         <p>
-          <strong>Aviso:</strong> Esta análise é baseada em dados históricos de manufatura. 
-          Não constitui recomendação de ação. A decisão final sobre ações corretivas é sempre do operador.
+          <strong>Aviso:</strong> Esta análise é baseada em dados históricos de manufatura.
+          Não constitui recomendação de ação. A decisão final sobre ações corretivas é sempre da Supervisão/Coordenação.
         </p>
       </div>
     </div>

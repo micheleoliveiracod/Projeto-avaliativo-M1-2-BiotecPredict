@@ -9,7 +9,7 @@ Este arquivo fornece contexto permanente ao agente Kiro sobre as regras de compl
 
 **Todo output do sistema deve incluir o disclaimer:**
 
-> "Esta análise é baseada em dados históricos de manufatura. Não constitui recomendação de ação. A decisão final sobre ações corretivas é sempre do operador."
+> "Esta análise é baseada em dados históricos de manufatura. Não constitui recomendação de ação. A decisão final sobre ações corretivas é sempre da Supervisão/Coordenação."
 
 - O disclaimer deve aparecer em **toda predição gerada pelo modelo ML**
 - Deve estar visível no dashboard em todas as páginas de análise
@@ -70,9 +70,8 @@ Cada dado persistido no banco deve ter rastreabilidade de origem:
 | Agitator Speed | 0 a 500 RPM | Log de anomalia; não persistir |
 
 ### Regra de mínimo de dados
-- Todo batch deve ter **≥ 5 leituras de sensores** válidas
-- Verificação automática ao processar CSV
-- Batches que não atingirem o mínimo são rejeitados com mensagem clara
+- Um batch é aceito com **1 ou mais** leituras de sensores válidas — não há mínimo de linhas
+- A única exigência é que reste ao menos 1 linha válida após a validação de ranges (`DataValidator`); um CSV sem nenhuma linha válida é rejeitado
 
 ---
 

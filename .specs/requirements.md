@@ -19,7 +19,7 @@ Este documento especifica os requisitos funcionais e não-funcionais para a Plat
 2. **Processamento de Batch** ✅
    - Backend processa dados do CSV
    - Validação de ranges de valores
-   - Limpeza de dados (nulos, outliers)
+   - Limpeza de nulos e detecção (sem remoção) de outliers estatísticos
    - Persistência em SQLite
 
 3. **Persistência de Dados** ✅

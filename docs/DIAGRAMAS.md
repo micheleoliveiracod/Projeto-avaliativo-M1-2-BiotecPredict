@@ -177,7 +177,7 @@ flowchart TB
         direction LR
         DS[(Dataset Kaggle)] --> FEAT[Feature Engineering]
         FEAT --> SC_FIT[StandardScaler.fit]
-        SC_FIT --> RF_FIT["RandomForest.fit\nn_estimators=100"]
+        SC_FIT --> RF_FIT["RandomForest.fit\nn_estimators=200"]
         RF_FIT --> EVAL{"Acurácia ≥ 80%?"}
         EVAL -- Não --> RF_FIT
         EVAL -- Sim --> SAVE_SC[scaler.pkl]

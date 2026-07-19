@@ -2,6 +2,14 @@
 ML Model - RandomForestClassifier para predição de risco de processo.
 
 Modelo treinado com dados históricos de bioprocessos para prever risco de desvio.
+
+Nota conceitual: este modelo mede DESVIO DO LIMITE ACEITÁVEL — quantos sensores (0, 1-2 ou
+3+) romperam a faixa aceitável do processo (ver ACCEPTABLE_RANGES abaixo), sinalizando se o
+lote deve ser descartado/investigado. Não mede qualidade/proximidade do ideal — isso é papel
+do ComplianceService (backend/services/compliance_service.py), que pontua o quão bem
+centrado o processo está mesmo dentro da faixa aceitável. As duas métricas respondem
+perguntas diferentes e podem legitimamente divergir no mesmo lote — ver
+backend/tests/fixtures/csv/README.md para exemplos reais.
 """
 
 import pickle
@@ -43,8 +51,16 @@ class MLModel:
         """Cria modelo default treinado com dados sintéticos."""
         np.random.seed(42)
 
-        # Gerar dados de treinamento sintéticos
-        X_synthetic = self._generate_synthetic_data(500)
+        # Gerar dados de treinamento sintéticos.
+        # 500 amostras deixava as combinacoes de "exatamente 1" ou "exatamente 3"
+        # sensores fora da faixa com poucas dezenas de exemplos cada (5 sensores x
+        # 2 direcoes de desvio), insuficiente para o classificador aprender a
+        # fronteira: o modelo chegava a prever LOW_RISK/MEDIUM_RISK para entradas
+        # que a propria funcao de rotulo (_generate_synthetic_labels) classificaria
+        # como MEDIUM_RISK/HIGH_RISK. 15000 amostras (custo de treino ~1s) da
+        # densidade suficiente por combinacao e elimina essa inconsistencia
+        # (validado com os fixtures em backend/tests/fixtures/csv/bugs/).
+        X_synthetic = self._generate_synthetic_data(15000)
         y_synthetic = self._generate_synthetic_labels(X_synthetic)
 
         # Treinar modelo
@@ -52,12 +68,12 @@ class MLModel:
         X_scaled = self.scaler.fit_transform(X_synthetic)
 
         self.model = RandomForestClassifier(
-            n_estimators=100,
-            max_depth=10,
+            n_estimators=200,
+            max_depth=14,
             random_state=42,
             n_jobs=-1,
-            min_samples_split=5,
-            min_samples_leaf=2,
+            min_samples_split=4,
+            min_samples_leaf=1,
         )
         self.model.fit(X_scaled, y_synthetic)
 
