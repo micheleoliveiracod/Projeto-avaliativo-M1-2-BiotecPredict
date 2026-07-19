@@ -338,7 +338,7 @@ Aguarde 20-30 segundos, depois acesse:
 
 ### Histórico de Batches
 
-![Histórico de Batches](docs/images/DATABASE.png)
+![Histórico de Batches](docs/images/DATA.png)
 
 ---
 
@@ -561,7 +561,7 @@ A IA (Claude Sonnet 4.6) gerou código com erros lógicos em três pontos do sis
 - GitHub: [@micheleoliveiracod](https://github.com/micheleoliveiracod)
 - Email: [data.analystmlso@gmail.com](mailto:data.analystmlso@gmail.com)
 
-**Última atualização:**  19 de Julho de 2026 (screenshots atualizados)
+**Última atualização:**  19 de Julho de 2026
 
 **Status do Projeto:** ✅ MVP Concluído | ✅ Merge final em main concluído
 
