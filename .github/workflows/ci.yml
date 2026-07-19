@@ -166,7 +166,7 @@ jobs:
           python -m uvicorn backend.main:app --host 0.0.0.0 --port 8001 &
           sleep 5
         env:
-          DATABASE_URL: sqlite:///./biotecpredict.db
+          DATABASE_URL: sqlite:///./Biotecpredict.db
 
       - name: Set up Node.js for Newman
         uses: actions/setup-node@v3
