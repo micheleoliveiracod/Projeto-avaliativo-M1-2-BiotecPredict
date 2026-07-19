@@ -158,6 +158,18 @@ O modelo é treinado com dados sintéticos gerados na inicialização, quando ne
 
 > **Por que essa distribuição?** Uma versão anterior do modelo treinava MEDIUM_RISK com apenas 1 sensor fora e HIGH_RISK com exatamente 3, criando um gap no espaço de features para cenários com 2 ou 4–5 sensores fora da faixa. Isso prejudicava a confiança nas predições dos CSVs de teste. O gap foi identificado nos testes de validação e corrigido — ver [`docs/prompts/03-refatoracao.md`](prompts/03-refatoracao.md), Refatoração 2.
 
+> **Limitação: o treino não tem noção de causa-raiz.** Ao montar cada amostra sintética, o(s)
+> sensor(es) que ficam fora da faixa aceitável são sorteados **aleatoriamente e sem nenhuma
+> correlação entre si** (`np.random.choice(5, size=n_out, replace=False)` em
+> `_generate_synthetic_data`, `backend/ml/model.py`). Ou seja, o modelo nunca viu, no treino, um
+> exemplo em que "pH e temperatura saem juntos porque é contaminação" ou "agitador baixo reduz o
+> oxigênio dissolvido" — ele aprendeu apenas a **contar quantos sensores estão fora** (0 / 1–2 /
+> 3+), não a reconhecer quais combinações fazem sentido fisicamente. Isso é suficiente para a
+> classificação de risco (LOW/MEDIUM/HIGH_RISK), mas significa que o `MLModel` **não deve ser
+> usado como ferramenta de causa-raiz** — para isso, veja o dataset simulado com correlações
+> fisiológicas reais em
+> [`datasets/simulacao_causa_raiz/README.md`](../datasets/simulacao_causa_raiz/README.md).
+
 ### Classificações e ação recomendada
 
 | Classificação | Significado | Ação recomendada |
@@ -339,6 +351,15 @@ Por serem eixos diferentes, é **esperado e correto** ver combinações como Sco
 | Score CRITICAL + HIGH_RISK | 3+ sensores romperam o limite aceitável. Intervenção imediata / candidato a descarte. |
 
 > Nota: essas duas métricas divergirem faz sentido pelo design acima. Já uma predição de ML que erra contra a própria regra de rótulo do seu treino sintético (ex: previsão LOW_RISK para um lote com 1 sensor comprovadamente fora do limite) **não** é esse tipo de divergência esperada — é um erro de acurácia do classificador. Ver seção 8.1.
+
+> **Dataset de simulação para análise de causa-raiz:** para um agente externo de IA praticar
+> diagnóstico de causa-raiz sobre a saída do BiotecPredict, veja
+> [`datasets/simulacao_causa_raiz/README.md`](../datasets/simulacao_causa_raiz/README.md) — lotes
+> simulados em que cada desvio tem uma única causa física plausível (ex: contaminação move pH +
+> temperatura + OD juntos; falha de agitador é isolada ou correlaciona só com OD), calibrados com
+> referências reais de bioprocesso e validados pelo `ComplianceService`/`MLModel` reais. Não
+> confundir com `backend/tests/fixtures/csv/` (fixtures de treino/validação dos métodos de
+> cálculo do próprio BiotecPredict).
 
 ---
 

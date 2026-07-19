@@ -2,6 +2,13 @@
 
 Arquivos CSV para uso nos testes **pytest**, **Postman** e **E2E** do projeto.
 
+> **Não confundir com dataset de simulação:** os arquivos desta pasta existem para **treinar e
+> validar os métodos de cálculo** do próprio BiotecPredict (`ComplianceService`, `MLModel`, API) —
+> os valores de score/classificação são travados e documentados abaixo, alterá-los quebra CI. Para
+> lotes simulados com causa-raiz fisicamente plausível, pensados para um agente externo de IA
+> analisar (e não para testar o BiotecPredict), veja
+> [`datasets/simulacao_causa_raiz/README.md`](../../../../datasets/simulacao_causa_raiz/README.md).
+
 **Localização**: `backend/tests/fixtures/csv/`
 **Base URL para Postman/E2E**: `http://localhost:8001/api/v1/upload`
 
