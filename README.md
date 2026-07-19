@@ -356,24 +356,26 @@ Aguarde 20-30 segundos, depois acesse:
 4. Clique em "Processar"
 5. Visualize o Manufacturing Compliance Score
 
-**Exemplo de CSV:**
+**Exemplo de CSV** (colunas exatas aceitas pelo `POST /api/v1/upload` — sem `batch_id` nem `timestamp`; cada arquivo enviado vira **um único lote**, e cada linha é uma leitura de sensor daquele lote):
 
 ```csv
-batch_id,timestamp,temperature,ph,dissolved_oxygen,pressure,agitator_speed
-BATCH001,2026-05-30T10:00:00,25.5,7.2,85.0,5.2,250
-BATCH001,2026-05-30T10:15:00,26.0,7.1,84.5,5.3,255
-BATCH001,2026-05-30T10:30:00,25.8,7.3,86.0,5.1,248
+temperature,ph,dissolved_oxygen,pressure,agitator_speed
+25.5,7.2,85.0,5.2,250
+26.0,7.1,84.5,5.3,255
+25.8,7.3,86.0,5.1,248
 ```
 
-**Resultado Esperado:**
+Arquivo real equivalente: [`backend/tests/fixtures/csv/control/valid_ideal.csv`](backend/tests/fixtures/csv/control/valid_ideal.csv)
+
+**Resultado Esperado** (`POST /api/v1/upload`):
 
 ```json
 {
-  "batch_id": "BATCH001",
-  "compliance_score": 85,
-  "classification": "ACCEPTABLE",
-  "risk_prediction": "LOW RISK",
-  "confidence": 0.92
+  "id": 1,
+  "upload_date": "2026-07-19T14:04:57.290135",
+  "status": "COMPLETED",
+  "compliance_score": 98.65,
+  "risk_prediction": "LOW_RISK"
 }
 ```
 
@@ -390,54 +392,58 @@ GET http://localhost:8000/api/v1/batches
 **Resposta:**
 
 ```json
-{
-  "batches": [
-    {
-      "id": "BATCH001",
-      "upload_date": "2026-05-30T10:00:00",
-      "compliance_score": 85,
-      "classification": "ACCEPTABLE",
-      "risk_prediction": "LOW RISK"
-    },
-    {
-      "id": "BATCH002",
-      "upload_date": "2026-05-30T11:00:00",
-      "compliance_score": 65,
-      "classification": "WARNING",
-      "risk_prediction": "MEDIUM RISK"
-    }
-  ]
-}
+[
+  {
+    "id": 1,
+    "upload_date": "2026-07-19T14:04:57.290135",
+    "status": "COMPLETED",
+    "compliance_score": 98.65,
+    "risk_prediction": "LOW_RISK"
+  },
+  {
+    "id": 2,
+    "upload_date": "2026-07-19T15:10:22.104812",
+    "status": "COMPLETED",
+    "compliance_score": 58.08,
+    "risk_prediction": "MEDIUM_RISK"
+  }
+]
 ```
 
-### � Cenário 3: Analisar Detalhes de um Batch
+### 📈 Cenário 3: Analisar Detalhes de um Batch
 
-**Objetivo:** Obter análise detalhada de um batch específico.
+**Objetivo:** Obter compliance score detalhado por sensor e a predição de risco de um batch específico.
 
-**Endpoint:**
+**Endpoints:**
 
 ```bash
-GET http://localhost:8000/api/v1/batch/BATCH001
+GET http://localhost:8000/api/v1/batch/1/sensors
+GET http://localhost:8000/api/v1/compliance/1
+GET http://localhost:8000/api/v1/prediction/1
 ```
 
-**Resposta:**
+**Resposta (`/compliance/1`):**
 
 ```json
 {
-  "batch_id": "BATCH001",
-  "upload_date": "2026-05-30T10:00:00",
-  "sensor_readings": [
-    {
-      "timestamp": "2026-05-30T10:00:00",
-      "temperature": 25.5,
-      "ph": 7.2,
-      "dissolved_oxygen": 85.0,
-      "pressure": 5.2,
-      "agitator_speed": 250
-    }
-  ],
-  "compliance_score": 85,
-  "risk_prediction": "LOW RISK"
+  "batch_id": 1,
+  "compliance_score": 98.65,
+  "classification": "ACCEPTABLE",
+  "sensor_metrics": {
+    "temperature": {"average": 25.01, "min": 24.6, "max": 25.5, "ideal_min": 24.0, "ideal_max": 26.0, "acceptable_min": 20.0, "acceptable_max": 30.0, "count": 10}
+  }
+}
+```
+
+**Resposta (`/prediction/1`):**
+
+```json
+{
+  "batch_id": 1,
+  "risk_prediction": "LOW_RISK",
+  "confidence_score": 0.985,
+  "interpretation": "Processo dentro dos parâmetros esperados. Nenhuma ação imediata necessária.",
+  "recommendations": ["Manter monitoramento contínuo", "Prosseguir com processo conforme planejado"]
 }
 ```
 
@@ -529,10 +535,15 @@ A IA (Claude Sonnet 4.6) gerou código com erros lógicos em três pontos do sis
 
 ## 📚 Documentação Adicional
 
-- [Documentação Técnica](docs/README.md)
-- [Guia de Desenvolvimento](docs/DEVELOPMENT.md)
-- [API Documentation](http://localhost:8000/docs)
-- [Steering Files](.specs/)
+- [PRD — Product Requirements Document](docs/PRD.md)
+- [Diagramas de Arquitetura (C4/UML)](docs/DIAGRAMAS.md)
+- [Cenários de Uso End-to-End](docs/cenarios-de-uso.md)
+- [Análise de Resultados (interpretação do dashboard e do cálculo de score/predição)](docs/analise-resultados.md)
+- [Consideração Crítica sobre Uso de IA](docs/consideracao-sobre-IAs.md)
+- [Caso Documentado de Saída Incorreta da IA](docs/m07-saida-incorreta-ia.md)
+- [Fixtures CSV de Teste (control/bugs/rejected/performance)](backend/tests/fixtures/csv/README.md)
+- [API Documentation (Swagger)](http://localhost:8000/docs)
+- [Steering Files / Specs](.specs/)
 
 ---
 
@@ -550,7 +561,7 @@ A IA (Claude Sonnet 4.6) gerou código com erros lógicos em três pontos do sis
 - GitHub: [@micheleoliveiracod](https://github.com/micheleoliveiracod)
 - Email: [data.analystmlso@gmail.com](mailto:data.analystmlso@gmail.com)
 
-**Última atualização:**  13 de Julho de 2026
+**Última atualização:**  19 de Julho de 2026
 
 **Status do Projeto:** ✅ MVP Concluído | ✅ Merge final em main concluído
 

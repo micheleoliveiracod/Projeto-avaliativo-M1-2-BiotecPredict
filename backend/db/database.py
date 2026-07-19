@@ -14,11 +14,25 @@ from sqlalchemy.orm import sessionmaker, Session
 from typing import Generator
 import os
 
-# Configurar URL do banco de dados
+# Caminho absoluto e único do banco, ancorado neste arquivo (não no cwd de quem
+# invoca o processo) — evita que "uvicorn backend.main:app" gere um .db num lugar
+# e "cd backend && python main.py" gere outro. Em produção/Docker, DATABASE_URL
+# é sempre definida via variável de ambiente (ver deploy/docker-compose.yml) e
+# sobrepõe este default.
+_BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # backend/db/
+_DEFAULT_DB_PATH = os.path.join(_BASE_DIR, "..", "data", "biotecpredict.db")
+
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
-    "sqlite:///./biotecpredict.db"
+    f"sqlite:///{_DEFAULT_DB_PATH}"
 )
+
+# Garante que a pasta do arquivo SQLite exista antes de abrir a conexão
+# (sqlite3 não cria diretórios pai sozinho)
+if DATABASE_URL.startswith("sqlite:///") and DATABASE_URL not in ("sqlite:///:memory:",):
+    db_dir = os.path.dirname(DATABASE_URL.replace("sqlite:///", "", 1))
+    if db_dir:
+        os.makedirs(db_dir, exist_ok=True)
 
 # Criar engine
 engine = create_engine(

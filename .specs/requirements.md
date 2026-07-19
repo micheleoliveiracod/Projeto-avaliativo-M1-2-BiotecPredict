@@ -100,7 +100,7 @@ Este documento especifica os requisitos funcionais e não-funcionais para a Plat
 12. **Testes Automatizados** ✅
     - **63 testes de integração** com pytest (`test_api_integration.py`) — todos passando
     - Testes cobrem: Health (3), Upload (12), Batches (7), Compliance (11), Prediction (9), ML (4), E2E Flow (3)
-    - Fixtures CSV compartilhadas em `backend/tests/fixtures/csv/` (10 arquivos: 6 válidos + 4 inválidos)
+    - Fixtures CSV compartilhadas em `backend/tests/fixtures/csv/`, organizadas por propósito: `control/` (comportamento correto), `bugs/` (reproduz divergências conhecidas entre Compliance e ML), `rejected/` (HTTP 400 esperado), `performance/` (teste de carga) — ver `tests/fixtures/csv/README.md`
     - Testes unitários com pytest — `unit/`, `repositories/`, `database/`, `health/`
     - Coleção Postman em `docs/postman/BiotecPredict.postman_collection.json` (testes automatizados em cada request)
     - Testes unitários frontend com Vitest
