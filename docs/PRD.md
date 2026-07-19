@@ -440,7 +440,7 @@ flowchart LR
     subgraph Treino ["Fase de Treino (offline)"]
         DS[(Dataset Kaggle\nBiopharmaceutical)] --> FEAT[Feature Engineering\ntemperature, pH, DO,\npressure, rpm]
         FEAT --> SCALE[StandardScaler]
-        SCALE --> RF_TRAIN[RandomForestClassifier\nn_estimators=100]
+        SCALE --> RF_TRAIN[RandomForestClassifier\nn_estimators=200]
         RF_TRAIN --> EVAL{Acurácia ≥ 80%?}
         EVAL -- Sim --> SAVE[Salvar .pkl\nrisk_predictor + scaler]
         EVAL -- Não --> RF_TRAIN

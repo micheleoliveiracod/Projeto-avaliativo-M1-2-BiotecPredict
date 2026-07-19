@@ -257,7 +257,7 @@ paths:
                 $ref: "#/components/schemas/ModelInfo"
               example:
                 model_type: RandomForestClassifier
-                n_estimators: 100
+                n_estimators: 200
                 features:
                   - temperature
                   - ph

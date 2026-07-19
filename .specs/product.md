@@ -4,7 +4,7 @@
 
 Plataforma SaaS end-to-end que monitora processos de manufatura biofarmacêutica utilizando dados industriais de sensores e machine learning. O sistema calcula um Manufacturing Compliance Score baseado em regras determinísticas e prevê riscos de desvios de processo, auxiliando operadores na tomada de decisão.
 
-> ⚠️ O produto **não substitui a supervisão humana**. As análises são informativas e baseadas em dados históricos. A decisão final sobre ações corretivas é sempre do operador.
+> ⚠️ O produto **não substitui a supervisão humana**. As análises são informativas e baseadas em dados históricos. A decisão final sobre ações corretivas é sempre da Supervisão/Coordenação.
 
 ---
 
@@ -112,12 +112,17 @@ Modelo RandomForestClassifier treinado com dados históricos para prever risco d
 
 ## Validação e Qualidade de Dados
 
-Sistema inclui scripts de validação para garantir qualidade dos dados e precisão dos cálculos:
+A validação de qualidade dos dados acontece no próprio pipeline de upload (`backend/processors/`),
+sem scripts ou relatórios em disco separados:
 
-- **validate_data.py** - Validação de qualidade dos dados imputados (ranges, outliers, anomalias)
-- **validate_compliance.py** - Validação de cálculos de compliance score
+- **`DataValidator`** — valida ranges físicos de cada sensor; rejeita linhas fora do range
+- **`DataCleaner`** — remove linhas com valores nulos e detecta (sem remover) leituras estatisticamente
+  destoantes por z-score, reportadas como aviso no retorno do upload
+- **`ComplianceService.detect_anomalous_readings()`** — reporta quantas leituras e quais sensores
+  romperam a faixa aceitável, exposto em `GET /api/v1/compliance/{batch_id}`
 
-Todos os relatórios são versionados em `backend/reports/` com rastreabilidade completa.
+Não há scripts `validate_data.py`/`validate_compliance.py` nem pasta `backend/reports/` — avisos e
+resultados de validação são retornados diretamente na resposta da API (ver `.specs/compliance.md`).
 
 ---
 

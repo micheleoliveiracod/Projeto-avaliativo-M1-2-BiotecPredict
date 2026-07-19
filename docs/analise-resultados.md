@@ -129,7 +129,7 @@ O resultado é uma **classe de risco** (LOW_RISK, MEDIUM_RISK ou HIGH_RISK) acom
 
 ### Como é calculado
 
-O modelo recebe como entrada a **média de cada sensor** ao longo de todas as leituras do batch (5 valores numéricos no total) e retorna a classe de maior probabilidade segundo o ensemble de 100 árvores de decisão.
+O modelo recebe como entrada a **média de cada sensor** ao longo de todas as leituras do batch (5 valores numéricos no total) e retorna a classe de maior probabilidade segundo o ensemble de 200 árvores de decisão.
 
 ```
 Entrada: [avg_temperatura, avg_ph, avg_do, avg_pressão, avg_agitador]
@@ -140,11 +140,11 @@ O critério aprendido pelo modelo reflete o número de sensores com valores fora
 
 | Sensores fora da faixa | Classe | Confiança típica observada |
 |---|---|---|
-| 0 | **LOW_RISK** | ~97% |
-| 1 a 2 | **MEDIUM_RISK** | ~80% |
-| 3 ou mais | **HIGH_RISK** | ~84% |
+| 0 | **LOW_RISK** | ~99,8% |
+| 1 a 2 | **MEDIUM_RISK** | ~97,9% |
+| 3 ou mais | **HIGH_RISK** | ~99,3% |
 
-> **O que significa a confiança?** É a fração de árvores do RandomForest que votaram na classe predita. Confiança de 84% significa que 84 de 100 árvores concordaram com a classificação. Não é uma medida de conformidade do processo — é a certeza do modelo sobre sua própria predição.
+> **O que significa a confiança?** É a fração de árvores do RandomForest que votaram na classe predita. Confiança de 99,3% significa que ~199 de 200 árvores concordaram com a classificação. Não é uma medida de conformidade do processo — é a certeza do modelo sobre sua própria predição. Valores atualizados em 2026-07-19 após retreinar o modelo com mais dados sintéticos (500→15.000 amostras) — ver seção 8.1.
 
 ### Treinamento do modelo
 
@@ -218,10 +218,12 @@ Simula um batch estável, com todos os sensores dentro das faixas ideais ou pró
 
 | Indicador | Valor | Classificação |
 |---|---|---|
-| Compliance Score | 93,78 | ACCEPTABLE |
-| Predição de Risco | LOW_RISK | Confiança: 97,5% |
+| Compliance Score | 92,39 | ACCEPTABLE |
+| Predição de Risco | LOW_RISK | Confiança: 99,8% |
 
-**Interpretação:** Processo estável. O único sensor fora da faixa ideal é o oxigênio dissolvido (77%, abaixo do ideal de 80–95%), o que é esperado nesse tipo de processo. O Score alto (93,78) confirma que o desvio é leve e não compromete a operação.
+**Interpretação:** Processo estável. O único sensor fora da faixa ideal é o oxigênio dissolvido (77%, abaixo do ideal de 80–95%), o que é esperado nesse tipo de processo. O Score alto (92,39) confirma que o desvio é leve e não compromete a operação.
+
+> Valores atualizados em 2026-07-19 após corrigir o `ComplianceService` (pontuação por leitura, não pela média bruta) e retreinar o `MLModel` com mais dados sintéticos — ver `backend/tests/fixtures/csv/README.md`, seção "Bugs de Cálculo — Corrigidos".
 
 ---
 
@@ -241,10 +243,10 @@ Simula falha progressiva no sistema de refrigeração (temperatura subindo de ~2
 
 | Indicador | Valor | Classificação |
 |---|---|---|
-| Compliance Score | 58,17 | WARNING |
-| Predição de Risco | MEDIUM_RISK | Confiança: 80,7% |
+| Compliance Score | 63,91 | WARNING |
+| Predição de Risco | MEDIUM_RISK | Confiança: 97,9% |
 
-**Interpretação:** Dois parâmetros saíram da faixa aceitável, o que classifica o batch como MEDIUM_RISK. O Score 58 (WARNING) reflete que 2 dos 5 sensores falharam, mas os outros 3 estão em condição ideal, o que eleva a média. Ação recomendada: verificar sistema de refrigeração e reposição de tampão de pH. O processo ainda pode ser recuperado sem interrupção do batch se a intervenção for rápida.
+**Interpretação:** Dois parâmetros saíram da faixa aceitável, o que classifica o batch como MEDIUM_RISK. O Score ~64 (WARNING) reflete que 2 dos 5 sensores falharam, mas os outros 3 estão em condição ideal, o que eleva a média. Ação recomendada: verificar sistema de refrigeração e reposição de tampão de pH. O processo ainda pode ser recuperado sem interrupção do batch se a intervenção for rápida.
 
 > **Nota:** uma versão anterior do código retornava score ~18 (CRITICAL) para este cenário, devido a uma dupla penalização no cálculo do Compliance Score — bug identificado, documentado e corrigido. Ver [`docs/prompts/03-refatoracao.md`](prompts/03-refatoracao.md), Refatoração 2.
 
@@ -267,7 +269,7 @@ Simula falha múltipla e progressiva: superaquecimento (temperatura chegando a ~
 | Indicador | Valor | Classificação |
 |---|---|---|
 | Compliance Score | 0,00 | CRITICAL |
-| Predição de Risco | HIGH_RISK | Confiança: 84,1% |
+| Predição de Risco | HIGH_RISK | Confiança: 99,3% |
 
 **Interpretação:** Todos os cinco parâmetros estão fora da faixa aceitável. O processo entrou em colapso operacional. Com oxigênio dissolvido em ~50%, as células estão em condição de hipóxia severa, comprometendo rendimento e viabilidade celular. Intervenção imediata e interrupção controlada do batch são recomendadas para evitar contaminação e perda total do lote.
 
@@ -289,49 +291,54 @@ As observações abaixo foram identificadas durante os testes de validação com
 
 ### 7.2 — A confiança não mede a saúde do processo — mede a certeza do modelo
 
-**Observação:** O modelo retorna confiança de **97,5%** para LOW_RISK e **84,1%** para HIGH_RISK. À primeira leitura, pode parecer estranho: se o processo está em colapso total (todos os 5 sensores fora da faixa), por que a confiança não é 100%? E por que o HIGH_RISK tem confiança menor do que o LOW_RISK?
+**Observação:** O modelo retorna confiança de **99,8%** para LOW_RISK, **97,9%** para MEDIUM_RISK e **99,3%** para HIGH_RISK. As três estão bem próximas e todas altas — diferente do que se observava antes de retreinar o modelo com mais dados sintéticos (ver seção 8.1), quando havia uma diferença grande entre elas (97,5% / 80,7% / 84,1%).
 
 **A confiança não mede o quão ruim está o processo. Mede o quanto o modelo tem certeza da sua própria resposta.**
 
-O modelo faz uma pergunta internamente: *"qual das três classes melhor descreve este batch?"* As 100 árvores do RandomForest votam. A confiança é o percentual de votos que a classe vencedora recebeu:
+O modelo faz uma pergunta internamente: *"qual das três classes melhor descreve este batch?"* As 200 árvores do RandomForest votam. A confiança é o percentual de votos que a classe vencedora recebeu:
 
 ```
-HIGH RISK CSV → 84 de 100 árvores votaram HIGH_RISK
-                → predição: HIGH_RISK, confiança: 84%
+HIGH RISK CSV → 199 de 200 árvores votaram HIGH_RISK
+                → predição: HIGH_RISK, confiança: 99,3%
 ```
 
-Isso significa: o modelo tem 84% de certeza de que o batch é HIGH_RISK — não que o processo está 84% bom ou 84% ruim.
+Isso significa: o modelo tem 99,3% de certeza de que o batch é HIGH_RISK — não que o processo está 99,3% bom ou 99,3% ruim.
 
-**Por que a confiança do HIGH_RISK (84%) é menor que a do LOW_RISK (97%)?**
+**Por que a confiança do MEDIUM_RISK (97,9%) é a mais baixa das três, mesmo depois do retreino?**
 
-O LOW_RISK é um cenário homogêneo e muito bem representado no treino (50% das amostras): todos os sensores dentro da faixa, valores próximos do centro. O modelo viu muitos exemplos parecidos, então 97 das 100 árvores concordam sem dificuldade.
-
-O HIGH_RISK cobre uma variedade maior de situações — pode ter 3, 4 ou 5 sensores fora, com diferentes combinações e magnitudes de desvio. O modelo viu menos exemplos dessa classe (20% do treino) e mais diversidade interna, então algumas árvores ficam em dúvida entre HIGH_RISK e MEDIUM_RISK. Por isso 84%, não 97%.
+O MEDIUM_RISK é a classe com a fronteira mais estreita: cobre exatamente "1 ou 2 sensores fora da faixa aceitável", entre o LOW_RISK (0 fora) e o HIGH_RISK (3+ fora). É naturalmente a região onde variações pequenas na severidade do desvio podem aproximar uma amostra do limite com a classe vizinha, então é razoável que seja a que mais gera dúvida residual entre as árvores — mesmo assim, 97,9% ainda é uma confiança alta.
 
 **Como ler os dois números juntos — guia rápido:**
 
 | CSV | Compliance Score | Predição | Confiança | Leitura correta |
 |---|---|---|---|---|
-| Low Risk | 93,78 | LOW_RISK | 97,5% | Processo saudável. Modelo muito certo disso. |
-| Medium Risk | 58,17 | MEDIUM_RISK | 80,7% | Processo com desvios. Modelo bastante certo. |
-| High Risk | 0,00 | HIGH_RISK | 84,1% | Processo em colapso. Modelo bastante certo. |
+| Low Risk | 92,39 | LOW_RISK | 99,8% | Processo saudável. Modelo muito certo disso. |
+| Medium Risk | 63,91 | MEDIUM_RISK | 97,9% | Processo com desvios. Modelo muito certo. |
+| High Risk | 0,00 | HIGH_RISK | 99,3% | Processo em colapso. Modelo muito certo. |
 
 O **Compliance Score** (0 a 100) é que mede a saúde do processo. A **confiança** (%) mede apenas a certeza interna do modelo sobre a classificação que ele escolheu. São métricas independentes — um processo péssimo pode ter confiança alta na predição justamente porque o modelo o reconhece claramente como HIGH_RISK.
 
 ---
 
-### 7.3 — Score e Predição contam histórias complementares, não idênticas
+### 7.3 — Score e Predição medem eixos diferentes por design: qualidade vs. descarte
 
-**Observação:** É possível ver Compliance Score em **WARNING** com Predição **MEDIUM_RISK** (cenário 2), ou Score **0** com Predição **HIGH_RISK** (cenário 3). Esses resultados não se contradizem — medem dimensões diferentes do mesmo problema.
+**Definição conceitual (2026-07-19):**
+
+- **Compliance Score** mede **qualidade** — o quão próximo cada sensor está do centro da faixa *ideal* do processo. Penaliza afastamento do ideal mesmo quando o sensor ainda está dentro da faixa aceitável. Responde: "quão boa está a produção?"
+- **Predição de Risco (ML)** mede **desvio do limite aceitável** — quantos sensores (0, 1-2 ou 3+) realmente romperam a faixa aceitável, sinalizando se o lote deve ser descartado/investigado. Responde: "quantos parâmetros de fato romperam o limite de aceite?"
+
+Por serem eixos diferentes, é **esperado e correto** ver combinações como Score **WARNING** + Predição **LOW_RISK** (processo mal centrado, mas nenhum sensor rompeu o limite aceitável — não precisa descartar) ou Score **CRITICAL** + Predição **MEDIUM_RISK** (qualidade muito baixa, mas só 1-2 sensores realmente fora do limite). Isso não é uma contradição a ser corrigida — é a plataforma respondendo duas perguntas de negócio diferentes com o mesmo lote.
 
 **Guia rápido de leitura conjunta:**
 
 | O que você vê | O que significa |
 |---|---|
-| Score ACCEPTABLE + LOW_RISK | Processo saudável. Tudo dentro dos limites. |
-| Score WARNING + MEDIUM_RISK | 1–2 sensores fora. Investigar. Processo recuperável. |
-| Score CRITICAL + HIGH_RISK | 3+ sensores fora. Intervenção imediata. |
-| Score CRITICAL + MEDIUM_RISK | 1–2 sensores muito fora, com desvio severo. Ação corretiva urgente. |
+| Score ACCEPTABLE + LOW_RISK | Processo saudável, bem centrado, nenhum sensor rompeu o limite aceitável. |
+| Score WARNING + LOW_RISK | Processo afastado do ideal (qualidade caindo), mas nenhum sensor rompeu o limite aceitável ainda — atenção preventiva, sem necessidade de descarte. |
+| Score WARNING/CRITICAL + MEDIUM_RISK | 1–2 sensores romperam o limite aceitável. Investigar causa raiz; lote recuperável. |
+| Score CRITICAL + HIGH_RISK | 3+ sensores romperam o limite aceitável. Intervenção imediata / candidato a descarte. |
+
+> Nota: essas duas métricas divergirem faz sentido pelo design acima. Já uma predição de ML que erra contra a própria regra de rótulo do seu treino sintético (ex: previsão LOW_RISK para um lote com 1 sensor comprovadamente fora do limite) **não** é esse tipo de divergência esperada — é um erro de acurácia do classificador. Ver seção 8.1.
 
 ---
 
@@ -351,15 +358,45 @@ O **Compliance Score** (0 a 100) é que mede a saúde do processo. A **confianç
 - **Predição de Risco é treinado com dados sintéticos:** o modelo representa padrões gerais de bioprocessos e pode ter precisão limitada em cenários muito específicos ou com combinações de sensores não representadas no treino.
 - **Ambos os indicadores refletem o momento do upload:** não capturam desvios que ocorram após o envio do arquivo. Para monitoramento contínuo, reenvie o arquivo periodicamente ou integre a API diretamente ao sistema de aquisição de dados.
 
-### 8.1 — Divergências de cálculo confirmadas (2026-07-19), ainda sem correção aplicada
+### 8.1 — Bugs de cálculo corrigidos (2026-07-19)
 
-Validando o código real com fixtures dedicadas, foram confirmadas 5 divergências entre
-`ComplianceService` e `MLModel`/`MLService` (não hipóteses — reproduzidas rodando o código):
-ML previsto abaixo do esperado para lotes com 1 ou 3 sensores fora da faixa aceitável, combinação
-WARNING + LOW_RISK no mesmo lote, uma leitura catastrófica mascarada pela média do lote (score
-94.13 · ACCEPTABLE mesmo com 1 leitura de temperatura quase o dobro do limite ideal), e uma
-inconsistência de arredondamento onde o mesmo score exibido "45.0" pode classificar como WARNING
-ou CRITICAL dependendo do valor não arredondado. Detalhes, valores exatos e os CSVs de reprodução
-de cada caso: [`backend/tests/fixtures/csv/README.md`](../backend/tests/fixtures/csv/README.md),
-seção "Bugs de Cálculo Encontrados".
+Validando o código real com fixtures dedicadas, 3 bugs reais foram confirmados e corrigidos (um
+quarto caso investigado, `warning_zone.csv`, era comportamento esperado por design — ver seção 7.3
+— e não foi alterado):
+
+1. **`ComplianceService` pontuava a média dos valores brutos, não a média dos scores.** Uma
+   leitura catastrófica isolada num lote de leituras boas era diluída na média bruta antes de
+   pontuar (`outlier_masked_by_average.csv` dava 94.13 · ACCEPTABLE). Corrigido para pontuar cada
+   leitura individualmente e só então tirar a média das notas. Decidimos **não** forçar downgrade
+   de classificação quando há um outlier isolado (pode ser falha de sensor/equipamento, não do
+   produto) — em vez disso, `ComplianceService.detect_anomalous_readings()` expõe quantas leituras
+   e quais sensores tiveram rompimento, como sinal informativo separado (`anomalous_readings` no
+   endpoint `/api/v1/compliance/{batch_id}`), sem alterar score nem classificação.
+
+   *Por que média e não mediana:* também testamos trocar a agregação por **mediana**, pensando em
+   blindar o score contra outliers. O resultado é o oposto do esperado — a mediana tem *breakdown
+   point* de quase 50% (só se move quando mais da metade dos dados muda), ou seja, foi desenhada
+   para **ignorar** uma minoria de valores extremos. Com 1 leitura catastrófica em 10, a mediana
+   das notas de temperatura em `outlier_masked_by_average.csv` volta a 100.0 e o score do lote
+   **sobe** de 95.48 para 97.48 — mascara o evento em vez de revelá-lo. A média (*breakdown point*
+   0%, todo valor entra com peso 1/n) é o estimador certo para não esconder o evento; a decisão de
+   agir ou não sobre ele fica no sinal informativo `anomalous_readings`, não na estatística de
+   agregação. Detalhes e números completos:
+   [`backend/tests/fixtures/csv/README.md`](../backend/tests/fixtures/csv/README.md).
+2. **`_classify_score` classificava o valor não arredondado**, causando score exibido "45.0"
+   classificar CRITICAL em um lote e WARNING em outro. Corrigido: arredondamento agora acontece
+   antes da classificação.
+3. **`MLModel` treinado com poucos dados sintéticos (500 amostras) errava contra a própria regra
+   de rótulo de treino** — previa LOW_RISK/MEDIUM_RISK para lotes que sua própria função
+   `_generate_synthetic_labels` rotularia MEDIUM_RISK/HIGH_RISK. Corrigido aumentando a base
+   sintética para 15.000 amostras e ajustando hiperparâmetros do `RandomForestClassifier`;
+   acurácia em teste sintético subiu de ~92% para ~99.6%.
+
+Detalhes completos, valores exatos antes/depois e os CSVs de regressão de cada caso:
+[`backend/tests/fixtures/csv/README.md`](../backend/tests/fixtures/csv/README.md), seção
+"Bugs de Cálculo — Corrigidos".
+
+Detalhes, valores exatos e os CSVs de reprodução de cada caso:
+[`backend/tests/fixtures/csv/README.md`](../backend/tests/fixtures/csv/README.md), seção
+"Bugs de Cálculo Encontrados".
 - **O modelo ML é retreinado do zero a cada inicialização do backend** quando os arquivos `.pkl` não existem: o comportamento pode variar levemente entre deploys. Para resultados reproduzíveis, versione os arquivos `backend/ml/models/risk_predictor.pkl` e `scaler.pkl`.
