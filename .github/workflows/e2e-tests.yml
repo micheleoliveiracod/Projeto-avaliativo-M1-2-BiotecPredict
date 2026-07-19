@@ -5,8 +5,6 @@ name: E2E Tests - Cypress
 # Configurado para rodar APENAS manualmente via workflow_dispatch
 on:
   workflow_dispatch:  # Apenas manual para testes
-  schedule:
-    - cron: '0 2 * * 0'  # Nunca roda (domingo às 2 AM UTC)
 
 jobs:
   e2e-tests:
@@ -14,15 +12,15 @@ jobs:
     name: E2E Tests (Cypress)
     
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
       
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
@@ -44,7 +42,7 @@ jobs:
           python -m uvicorn main:app --host 0.0.0.0 --port 8001 &
           sleep 5
         env:
-          DATABASE_URL: sqlite:///./biotecpredict.db
+          DATABASE_URL: sqlite:///./Biotecpredict.db
       
       - name: Start frontend dev server
         run: |
@@ -59,14 +57,14 @@ jobs:
       
       - name: Upload Cypress screenshots
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: cypress-screenshots
           path: frontend/cypress/screenshots
       
       - name: Upload Cypress videos
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: cypress-videos
           path: frontend/cypress/videos

@@ -44,7 +44,7 @@ graph TB
     end
 
     subgraph STORAGE ["Persistência"]
-        DB[(SQLite\nbiotecpredict.db)]
+        DB[(SQLite\nBiotecpredict.db)]
         PKL1[(risk_predictor.pkl)]
         PKL2[(scaler.pkl)]
     end
@@ -268,7 +268,7 @@ graph TB
         E2[SensorReading]
     end
 
-    E --> F[(SQLite\nbiotecpredict.db)]
+    E --> F[(SQLite\nBiotecpredict.db)]
 ```
 
 ---

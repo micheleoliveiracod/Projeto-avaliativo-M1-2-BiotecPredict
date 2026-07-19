@@ -319,7 +319,7 @@ graph TB
     end
 
     subgraph DB ["Persistência"]
-        SQLITE[(SQLite<br/>biotecpredict.db)]
+        SQLITE[(SQLite<br/>Biotecpredict.db)]
     end
 
     UI -- "POST /api/v1/upload" --> SVC

@@ -51,11 +51,12 @@ if "%ACTION%"=="status" (
 )
 
 if "%ACTION%"=="clean" (
-    echo [AVISO] Isso vai remover todos os containers e dados!
+    echo [AVISO] Isso vai remover os containers e o modelo de ML treinado!
+    echo O banco de dados NAO e apagado - fica em backend\data\Biotecpredict.db.
     set /p CONFIRM="Tem certeza? (s/N): "
     if /i "!CONFIRM!"=="s" (
         docker compose down -v
-        echo [OK] Sistema e dados removidos.
+        echo [OK] Containers e modelo de ML removidos. Banco de dados preservado.
     ) else (
         echo Operacao cancelada.
     )

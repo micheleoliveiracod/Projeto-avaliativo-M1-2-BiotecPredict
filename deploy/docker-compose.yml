@@ -9,13 +9,13 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - biotecpredict_data:/app/data
+      # Bind mount (não volume nomeado): o banco fica em backend/data/Biotecpredict.db
+      # no host, um arquivo real e acessível fora do Docker (ex: DB Browser for SQLite),
+      # no mesmo caminho usado por padrão quando o backend roda localmente sem Docker.
+      - ../backend/data:/app/data
       - biotecpredict_models:/app/backend/ml/models
     environment:
-      # Banco oficial único: sempre /app/data/biotecpredict.db, persistido no
-      # volume nomeado biotecpredict_data. Local (fora do Docker) usa o mesmo
-      # nome de arquivo em backend/data/biotecpredict.db (default de database.py).
-      - DATABASE_URL=sqlite:///./data/biotecpredict.db
+      - DATABASE_URL=sqlite:///./data/Biotecpredict.db
       - ENVIRONMENT=production
     restart: unless-stopped
     networks:
@@ -36,7 +36,6 @@ services:
       - biotecpredict-net
 
 volumes:
-  biotecpredict_data:
   biotecpredict_models:
 
 networks:

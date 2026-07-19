@@ -271,8 +271,8 @@ Persistência de dados.
 
 | Ambiente | Arquivo/URL | Como é definido |
 |---|---|---|
-| Oficial (dev local, sem Docker) | `backend/data/biotecpredict.db` | Default de `database.py`, ancorado em `__file__` (não no cwd de quem roda o processo — evita gerar cópias em lugares diferentes conforme o comando usado para subir o backend) |
-| Oficial (Docker) | `/app/data/biotecpredict.db`, persistido no volume nomeado `biotecpredict_data` | `DATABASE_URL` definida em `deploy/docker-compose.yml` |
+| Oficial (dev local, sem Docker) | `backend/data/Biotecpredict.db` | Default de `database.py`, ancorado em `__file__` (não no cwd de quem roda o processo — evita gerar cópias em lugares diferentes conforme o comando usado para subir o backend) |
+| Oficial (Docker) | `/app/data/Biotecpredict.db` no container, com **bind mount** para `backend/data/Biotecpredict.db` no host | `DATABASE_URL` + volume definidos em `deploy/docker-compose.yml` — é o mesmo arquivo físico do cenário "dev local", visível e abrível fora do Docker (ex: DB Browser for SQLite), não um volume nomeado opaco |
 | Teste (pytest) | SQLite **in-memory** (`sqlite:///:memory:`), um por função de teste | `tests/pytest/conftest.py` (`test_engine` fixture) — nunca toca disco, isolado por teste |
 
 `DATABASE_TEST_URL` não existe mais como variável lida pelo código — a suíte de testes nunca usa
@@ -386,7 +386,7 @@ backend/services/batch_service.py    → cria Batch + SensorReadings no SQLite
     ↓
 backend/db/repository.py             → BatchRepository · SensorReadingRepository
     ↓
-SQLite (biotecpredict.db)            → persistência
+SQLite (Biotecpredict.db)            → persistência
     ↓
 GET /compliance/{id}                 → backend/services/compliance_service.py
     ↓

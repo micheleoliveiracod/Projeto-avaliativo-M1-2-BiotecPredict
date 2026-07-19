@@ -41,11 +41,12 @@ case "$ACTION" in
     docker compose ps
     ;;
   clean)
-    echo "[AVISO] Isso vai remover todos os containers e dados!"
+    echo "[AVISO] Isso vai remover os containers e o modelo de ML treinado!"
+    echo "O banco de dados NÃO é apagado - fica em backend/data/Biotecpredict.db."
     read -p "Tem certeza? (s/N): " CONFIRM
     if [[ "$CONFIRM" =~ ^[sS]$ ]]; then
       docker compose down -v
-      echo "[OK] Sistema e dados removidos."
+      echo "[OK] Containers e modelo de ML removidos. Banco de dados preservado."
     else
       echo "Operação cancelada."
     fi
