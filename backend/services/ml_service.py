@@ -44,7 +44,7 @@ class MLService:
         model = MLService._get_model()
         return {
             "model_type": "RandomForestClassifier",
-            "n_estimators": 100,
+            "n_estimators": model.model.n_estimators,
             "features": model.FEATURES,
             "risk_classes": list(model.RISK_CLASSES.values()),
             "feature_importance": model.get_feature_importance(),
