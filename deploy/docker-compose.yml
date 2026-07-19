@@ -12,6 +12,9 @@ services:
       - biotecpredict_data:/app/data
       - biotecpredict_models:/app/backend/ml/models
     environment:
+      # Banco oficial único: sempre /app/data/biotecpredict.db, persistido no
+      # volume nomeado biotecpredict_data. Local (fora do Docker) usa o mesmo
+      # nome de arquivo em backend/data/biotecpredict.db (default de database.py).
       - DATABASE_URL=sqlite:///./data/biotecpredict.db
       - ENVIRONMENT=production
     restart: unless-stopped
