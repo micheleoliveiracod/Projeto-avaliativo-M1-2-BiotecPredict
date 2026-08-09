@@ -555,7 +555,7 @@ A IA (Claude Sonnet 4.6) gerou código com erros lógicos em três pontos do sis
 
 ---
 
-## 👨‍💻 Desenvolvedor
+## 👩‍💻🪄 Desenvolvedora
 
 **Desenvolvido com 💜 por Michele Oliveira**
 - GitHub: [@micheleoliveiracod](https://github.com/micheleoliveiracod)
