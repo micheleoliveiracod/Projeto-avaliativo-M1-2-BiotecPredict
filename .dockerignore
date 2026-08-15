@@ -1,0 +1,67 @@
+# Controle de versão
+.git/
+.gitattributes
+.github/
+
+# Segredos e configuração de ambiente
+.env
+.env.*
+!.env.example
+
+# Banco de dados (contém dados reais, não deve ir para a imagem)
+*.db
+*.sqlite
+*.sqlite3
+backend/data/
+backend/db/
+
+# Dependências
+node_modules/
+venv/
+env/
+ENV/
+
+# Build outputs
+dist/
+build/
+frontend/dist/
+frontend/.vite/
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Cobertura de testes / cache
+.coverage
+coverage.xml
+coverage/
+htmlcov/
+.pytest_cache/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Claude Code / worktrees / specs internos
+.claude/
+.specs/
+.kiro/
+
+# Documentação e arquivos que não precisam estar na imagem
+docs/
+README.md
+LICENSE
+datasets/
