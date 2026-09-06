@@ -5,7 +5,13 @@ import styles from './Dashboard.module.css';
 const DashboardPage: React.FC = () => {
   return (
     <div className={styles.dashboardPage}>
-      <h1>Plataforma de Manufatura Preditiva para a Indústria de Biotecnologia</h1>
+      <header className={styles.masthead}>
+        <img
+          src="/logo-lockup.png"
+          alt="BiotecPredict — Plataforma de Manufatura Preditiva para a Indústria de Biotecnologia"
+          className={styles.mastheadLogo}
+        />
+      </header>
       <Dashboard />
     </div>
   );
