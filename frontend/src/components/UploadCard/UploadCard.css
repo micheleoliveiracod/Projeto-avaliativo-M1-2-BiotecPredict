@@ -69,6 +69,8 @@
 .upload-title {
   font-family: var(--font-sans);
   font-weight: 500;
+  text-transform: none;
+  letter-spacing: normal;
   margin: 0;
   font-size: 1.25rem;
   color: var(--ink);
