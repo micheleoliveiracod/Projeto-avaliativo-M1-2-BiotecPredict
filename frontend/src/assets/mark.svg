@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="72" height="44" viewBox="0 0 72 44" fill="none" role="img" aria-label="BiotecPredict">
+  <rect x="2" y="26" width="7" height="16" rx="3.5" fill="#5d5294"></rect>
+  <rect x="15" y="18" width="7" height="24" rx="3.5" fill="#796cbf"></rect>
+  <rect x="28" y="22" width="7" height="20" rx="3.5" fill="#5d5294"></rect>
+  <rect x="41" y="10" width="7" height="32" rx="3.5" fill="#968ae0"></rect>
+  <rect x="54" y="2" width="7" height="40" rx="3.5" fill="#9184d9"></rect>
+  <circle cx="67.5" cy="8" r="3.5" fill="#d2cefd"></circle>
+</svg>

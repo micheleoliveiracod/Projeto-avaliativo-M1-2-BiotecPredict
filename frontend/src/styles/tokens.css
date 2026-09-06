@@ -1,0 +1,88 @@
+/* BiotecPredict, design tokens -- padronizados com o Root-Spector (ver
+   ../../DESIGN.md). Mesma paleta, tipografia e escala de controles;
+   único ponto de divergência entre os dois produtos é a arte da marca
+   (logo própria do BiotecPredict, fora deste arquivo).
+
+   Superfície clara e neutra: página gelo, caixas brancas. O roxo aparece
+   em pontos definidos -- botão, foco, rótulo de fase -- nunca como
+   preenchimento de área grande, o que deixa o semáforo dos indicadores
+   (compliance / risco) como o único elemento colorido de peso. Nenhuma
+   cor hardcoded fora deste arquivo. */
+
+:root {
+  color-scheme: light;
+
+  /* superfícies e texto */
+  --paper: #f4f5f7; /* fundo da página, gelo */
+  --paper-raised: #ffffff; /* caixas */
+  --paper-sunken: #f7f8fa; /* campos, cabeçalho de tabela, código */
+  --ink: #1d1d21;
+  --ink-soft: #676770;
+  --line: #e4e5e9;
+  --line-soft: #eeeff2;
+
+  /* acento de interface: os passos escuros do lilás, porque o tom
+     original não tem contraste suficiente sobre branco. O roxo cheio
+     pertence ao botão de ação e a mais nada. */
+  --accent: #5b4bb8; /* fundo do botão primário, anel de foco */
+  --accent-hover: #4b3ca0;
+  --accent-active: #3f3287;
+  --accent-ink: #4c3f97; /* texto, link e rótulo em acento */
+  --accent-deep: #3f3480; /* texto sobre --accent-soft */
+  --accent-border: #d9d3f2; /* borda da caixa de mensagem */
+  --accent-soft: #f1eefc; /* faixa de título / callout */
+  --accent-art: #9184d9; /* reservado à arte da marca própria do BiotecPredict */
+
+  /* controles: alvos grandes, porque quem usa está no piso de produção */
+  --control-height: 48px;
+  --field-height: 52px;
+  --control-border: #c3c4cc;
+  --control-border-strong: #8b8c96;
+  --disabled-bg: #e4e5e9;
+  --disabled-fg: #82828b;
+
+  --shadow: 0 0 0 1px #e4e5e9;
+  --shadow-lg: 0 1px 2px rgba(29, 29, 33, 0.05), 0 12px 32px rgba(29, 29, 33, 0.08);
+
+  /* semáforo: verde, âmbar e vermelho sobre superfície clara. Fundo
+     tingido, borda na mesma família, texto escuro legível. Usado tanto
+     nos badges de compliance/risco do dashboard quanto nos alertas. */
+  --ok-bg: #e6f4ec;
+  --ok-border: #c7e6d4;
+  --ok-fg: #1b7a44;
+  --warn-bg: #fdf6d8;
+  --warn-border: #ecdd8f;
+  --warn-fg: #7a6a00;
+  --critical-bg: #fceae7;
+  --critical-border: #f2cec8;
+  --critical-fg: #b23726;
+  --neutral-bg: #efeff2;
+  --neutral-border: #e0e0e5;
+  --neutral-fg: #676770;
+
+  /* tipografia */
+  --text-base: 16px; /* corpo, nunca abaixo disso */
+  --text-question: 19px;
+  --text-state: 17px;
+
+  --font-sans: "Inter", -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Consolas, monospace;
+
+  --radius: 10px;
+  --radius-sm: 6px;
+}
+
+/* Faixa de marca quase preta -- tokens de faixa, não um tema alternativo
+   (não segue o tema do sistema operacional). Reservada a pontos pontuais
+   de identidade (ex. rodapé), nunca dentro das telas de trabalho. */
+.on-dark {
+  --paper: #0b0a10;
+  --paper-raised: #14121c;
+  --paper-sunken: #08070c;
+  --ink: #f3f5fe;
+  --ink-soft: #b7b7c2;
+  --line: #2b2741;
+  --accent: var(--accent-art);
+  --accent-ink: #d2cefd;
+  --accent-soft: #2b2741;
+}

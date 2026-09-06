@@ -1,26 +1,45 @@
 .dashboardPage {
   min-height: calc(100vh - 200px);
-  background-color: #f5f5f5;
 }
 
-.dashboardPage h1 {
-  text-align: center;
-  color: #333;
+/* Faixa quase preta com a arte da marca, mesmo padrão do Root-Spector
+   (ver frontend/DESIGN.md): um dos poucos lugares onde a logo aparece
+   por extenso, nunca dentro das telas de trabalho. */
+.masthead {
+  background: #161826;
+  border-radius: var(--radius);
+  padding: 28px 32px;
   margin-bottom: 2rem;
-  font-size: 2rem;
+  text-align: center;
+}
+
+.mastheadLogo {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 720px;
+  margin: 0 auto;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
-  .dashboardPage h1 {
-    font-size: 1.5rem;
+  .masthead {
+    padding: 22px 20px;
     margin-bottom: 1.5rem;
+  }
+
+  .mastheadLogo {
+    max-width: 480px;
   }
 }
 
 @media (max-width: 480px) {
-  .dashboardPage h1 {
-    font-size: 1.25rem;
+  .masthead {
+    padding: 18px 16px;
     margin-bottom: 1rem;
+  }
+
+  .mastheadLogo {
+    max-width: 340px;
   }
 }
