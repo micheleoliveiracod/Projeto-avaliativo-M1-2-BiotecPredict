@@ -47,18 +47,22 @@
   /* semáforo: verde, âmbar e vermelho sobre superfície clara. Fundo
      tingido, borda na mesma família, texto escuro legível. Usado tanto
      nos badges de compliance/risco do dashboard quanto nos alertas. */
-  --ok-bg: #e6f4ec;
-  --ok-border: #c7e6d4;
-  --ok-fg: #1b7a44;
-  --warn-bg: #fff3b0;
-  --warn-border: #ffd400;
-  --warn-fg: #7a5c00;
-  --critical-bg: #fceae7;
-  --critical-border: #f2cec8;
-  --critical-fg: #b23726;
+  --ok-bg: #e2f7e9;
+  --ok-border: #a7e3bb;
+  --ok-fg: #15803d; /* verde tradicional, legível como texto */
+  --ok-strong: #22c55e; /* verde cheio, vívido -- preenchimentos sólidos grandes (círculo, ponto) */
+  --warn-bg: #fff6c8;
+  --warn-border: #ffe066;
+  --warn-fg: #8a6a00; /* amarelo escurecido só o necessário pra legibilidade de texto */
+  --warn-strong: #ffc107; /* amarelo ouro tradicional, cheio -- --warn-fg escurece pra caber como texto e vira mostarda, não serve pra área grande */
+  --critical-bg: #fde3e0;
+  --critical-border: #f5aca3;
+  --critical-fg: #dc2626; /* vermelho tradicional, legível como texto */
+  --critical-strong: #ef4444; /* vermelho cheio, vívido */
   --neutral-bg: #efeff2;
   --neutral-border: #e0e0e5;
   --neutral-fg: #676770;
+  --neutral-strong: #9a9aa3;
 
   /* tipografia */
   --text-base: 16px; /* corpo, nunca abaixo disso */

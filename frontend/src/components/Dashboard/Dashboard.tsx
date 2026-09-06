@@ -230,6 +230,7 @@ const Dashboard: React.FC<DashboardProps> = ({ refreshInterval = 30000 }) => {
       '--badge-bg': `var(--${tone}-bg)`,
       '--badge-border': `var(--${tone}-border)`,
       '--badge-fg': `var(--${tone}-fg)`,
+      '--badge-strong': `var(--${tone}-strong)`,
     }) as React.CSSProperties
 
   /**
