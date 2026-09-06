@@ -54,7 +54,7 @@
   --warn-bg: #fff6c8;
   --warn-border: #ffe066;
   --warn-fg: #8a6a00; /* amarelo escurecido só o necessário pra legibilidade de texto */
-  --warn-strong: #ffcc00; /* amarelo tradicional cheio -- --warn-fg escurece pra caber como texto e vira mostarda, não serve pra área grande */
+  --warn-strong: #ffc107; /* amarelo ouro tradicional, cheio -- --warn-fg escurece pra caber como texto e vira mostarda, não serve pra área grande */
   --critical-bg: #fde3e0;
   --critical-border: #f5aca3;
   --critical-fg: #dc2626; /* vermelho tradicional, legível como texto */
