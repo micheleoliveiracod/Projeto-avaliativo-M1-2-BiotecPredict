@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import UploadCard from '../../components/UploadCard/UploadCard';
+import Masthead from '../../components/Masthead/Masthead';
 import styles from './Upload.module.css';
 
 const Upload: React.FC = () => {
@@ -8,6 +9,7 @@ const Upload: React.FC = () => {
 
   return (
     <div className={styles.uploadPage}>
+      <Masthead />
       <div className={styles.container}>
         <h1>Upload de Arquivo CSV</h1>
         <p className={styles.description}>
