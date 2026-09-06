@@ -50,9 +50,9 @@
   --ok-bg: #e6f4ec;
   --ok-border: #c7e6d4;
   --ok-fg: #1b7a44;
-  --warn-bg: #fdf6d8;
-  --warn-border: #ecdd8f;
-  --warn-fg: #7a6a00;
+  --warn-bg: #fff3b0;
+  --warn-border: #ffd400;
+  --warn-fg: #7a5c00;
   --critical-bg: #fceae7;
   --critical-border: #f2cec8;
   --critical-fg: #b23726;
