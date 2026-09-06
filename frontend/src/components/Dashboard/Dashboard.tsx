@@ -221,34 +221,46 @@ const Dashboard: React.FC<DashboardProps> = ({ refreshInterval = 30000 }) => {
   }
 
   /**
-   * Gets color for compliance status
+   * Cores do semáforo do design system (ver src/styles/tokens.css e
+   * frontend/DESIGN.md): fundo pastel, borda na mesma família, texto
+   * legível. Nunca vermelho/amarelo/verde saturado.
    */
-  const getStatusColor = (status: string): string => {
+  const semaphoreVars = (tone: 'ok' | 'warn' | 'critical' | 'neutral'): React.CSSProperties =>
+    ({
+      '--badge-bg': `var(--${tone}-bg)`,
+      '--badge-border': `var(--${tone}-border)`,
+      '--badge-fg': `var(--${tone}-fg)`,
+    }) as React.CSSProperties
+
+  /**
+   * Tom do semáforo para o status de compliance
+   */
+  const getStatusTone = (status: string): 'ok' | 'warn' | 'critical' | 'neutral' => {
     switch (status) {
       case 'ACCEPTABLE':
-        return '#10b981' // green
+        return 'ok'
       case 'WARNING':
-        return '#f59e0b' // amber
+        return 'warn'
       case 'CRITICAL':
-        return '#ef4444' // red
+        return 'critical'
       default:
-        return '#6b7280' // gray
+        return 'neutral'
     }
   }
 
   /**
-   * Gets color for risk level
+   * Tom do semáforo para o nível de risco
    */
-  const getRiskColor = (risk: string): string => {
+  const getRiskTone = (risk: string): 'ok' | 'warn' | 'critical' | 'neutral' => {
     switch (risk) {
       case 'LOW_RISK':
-        return '#10b981' // green
+        return 'ok'
       case 'MEDIUM_RISK':
-        return '#f59e0b' // amber
+        return 'warn'
       case 'HIGH_RISK':
-        return '#ef4444' // red
+        return 'critical'
       default:
-        return '#6b7280' // gray
+        return 'neutral'
     }
   }
 
@@ -319,13 +331,13 @@ const Dashboard: React.FC<DashboardProps> = ({ refreshInterval = 30000 }) => {
         <div className="kpi-card compliance-card">
           <div className="card-header">
             <h2 className="card-title">Compliance Score</h2>
-            <span className="card-badge" style={{ backgroundColor: getStatusColor(complianceStatus) }}>
+            <span className="card-badge" style={semaphoreVars(getStatusTone(complianceStatus))}>
               {complianceStatus}
             </span>
           </div>
           <div className="card-content">
             <div className="score-display">
-              <div className="score-circle" style={{ borderColor: getStatusColor(complianceStatus) }}>
+              <div className="score-circle" style={semaphoreVars(getStatusTone(complianceStatus))}>
                 <span className="score-value">{complianceScore}</span>
                 <span className="score-unit">/100</span>
               </div>
@@ -344,13 +356,13 @@ const Dashboard: React.FC<DashboardProps> = ({ refreshInterval = 30000 }) => {
         <div className="kpi-card risk-card">
           <div className="card-header">
             <h2 className="card-title">Predição de Risco</h2>
-            <span className="card-badge" style={{ backgroundColor: getRiskColor(riskPrediction) }}>
+            <span className="card-badge" style={semaphoreVars(getRiskTone(riskPrediction))}>
               {riskPrediction}
             </span>
           </div>
           <div className="card-content">
             <div className="risk-display">
-              <div className="risk-indicator" style={{ backgroundColor: getRiskColor(riskPrediction) }}></div>
+              <div className="risk-indicator" style={semaphoreVars(getRiskTone(riskPrediction))}></div>
               <div className="risk-info">
                 <p className="risk-label">Confiança</p>
                 <p className="risk-value">{(confidenceScore * 100).toFixed(1)}%</p>
@@ -388,7 +400,7 @@ const Dashboard: React.FC<DashboardProps> = ({ refreshInterval = 30000 }) => {
                   className="range-fill"
                   style={{
                     width: `${Math.min(100, ((sensorData.temperature - 20) / 10) * 100)}%`,
-                    backgroundColor: sensorData.temperature >= 20 && sensorData.temperature <= 30 ? '#10b981' : '#ef4444'
+                    backgroundColor: sensorData.temperature >= 20 && sensorData.temperature <= 30 ? 'var(--ok-fg)' : 'var(--critical-fg)'
                   }}
                 ></div>
               </div>
@@ -411,7 +423,7 @@ const Dashboard: React.FC<DashboardProps> = ({ refreshInterval = 30000 }) => {
                   className="range-fill"
                   style={{
                     width: `${Math.min(100, ((sensorData.ph - 6.5) / 1.0) * 100)}%`,
-                    backgroundColor: sensorData.ph >= 6.5 && sensorData.ph <= 7.5 ? '#10b981' : '#ef4444'
+                    backgroundColor: sensorData.ph >= 6.5 && sensorData.ph <= 7.5 ? 'var(--ok-fg)' : 'var(--critical-fg)'
                   }}
                 ></div>
               </div>
@@ -434,7 +446,7 @@ const Dashboard: React.FC<DashboardProps> = ({ refreshInterval = 30000 }) => {
                   className="range-fill"
                   style={{
                     width: `${Math.min(100, ((sensorData.dissolved_oxygen - 70) / 30) * 100)}%`,
-                    backgroundColor: sensorData.dissolved_oxygen >= 70 && sensorData.dissolved_oxygen <= 100 ? '#10b981' : '#ef4444'
+                    backgroundColor: sensorData.dissolved_oxygen >= 70 && sensorData.dissolved_oxygen <= 100 ? 'var(--ok-fg)' : 'var(--critical-fg)'
                   }}
                 ></div>
               </div>
@@ -457,7 +469,7 @@ const Dashboard: React.FC<DashboardProps> = ({ refreshInterval = 30000 }) => {
                   className="range-fill"
                   style={{
                     width: `${Math.min(100, ((sensorData.pressure - 4.5) / 1.5) * 100)}%`,
-                    backgroundColor: sensorData.pressure >= 4.5 && sensorData.pressure <= 6.0 ? '#10b981' : '#ef4444'
+                    backgroundColor: sensorData.pressure >= 4.5 && sensorData.pressure <= 6.0 ? 'var(--ok-fg)' : 'var(--critical-fg)'
                   }}
                 ></div>
               </div>
@@ -480,7 +492,7 @@ const Dashboard: React.FC<DashboardProps> = ({ refreshInterval = 30000 }) => {
                   className="range-fill"
                   style={{
                     width: `${Math.min(100, ((sensorData.agitator_speed - 200) / 100) * 100)}%`,
-                    backgroundColor: sensorData.agitator_speed >= 200 && sensorData.agitator_speed <= 300 ? '#10b981' : '#ef4444'
+                    backgroundColor: sensorData.agitator_speed >= 200 && sensorData.agitator_speed <= 300 ? 'var(--ok-fg)' : 'var(--critical-fg)'
                   }}
                 ></div>
               </div>
@@ -563,18 +575,18 @@ const Dashboard: React.FC<DashboardProps> = ({ refreshInterval = 30000 }) => {
                       {batch.compliance_score != null ? (
                         <span
                           className="score-badge"
-                          style={{ backgroundColor: getStatusColor(classifyComplianceScore(batch.compliance_score)) }}
+                          style={semaphoreVars(getStatusTone(classifyComplianceScore(batch.compliance_score)))}
                         >
                           {batch.compliance_score}
                         </span>
                       ) : (
-                        <span className="score-badge" style={{ backgroundColor: '#6b7280' }}>—</span>
+                        <span className="score-badge" style={semaphoreVars('neutral')}>—</span>
                       )}
                     </td>
                     <td className="table-cell">
                       <span
                         className="risk-badge"
-                        style={{ backgroundColor: getRiskColor(batch.risk_prediction ?? '') }}
+                        style={semaphoreVars(getRiskTone(batch.risk_prediction ?? ''))}
                       >
                         {batch.risk_prediction ?? '—'}
                       </span>
