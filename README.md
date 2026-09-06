@@ -1,4 +1,16 @@
-# BiotecPredict
+<div align="center">
+
+<img src="docs/brand/logo-lockup.png" alt="BiotecPredict" width="720" />
+
+![Python](https://img.shields.io/badge/Python-3.11-9184D9?style=flat-square&labelColor=0B0A10)
+![FastAPI](https://img.shields.io/badge/FastAPI-backend-9184D9?style=flat-square&labelColor=0B0A10)
+![React](https://img.shields.io/badge/React-frontend-9184D9?style=flat-square&labelColor=0B0A10)
+[![CI](https://github.com/micheleoliveiracod/Projeto-avaliativo-M1-2-BiotecPredict/actions/workflows/ci.yml/badge.svg)](https://github.com/micheleoliveiracod/Projeto-avaliativo-M1-2-BiotecPredict/actions/workflows/ci.yml)
+![License](https://img.shields.io/badge/licenca-Apache--2.0-9184D9?style=flat-square&labelColor=0B0A10)
+
+</div>
+
+---
 
 **Plataforma de Manufatura Preditiva para a Indústria de Biotecnologia**
 
@@ -555,7 +567,7 @@ A IA (Claude Sonnet 4.6) gerou código com erros lógicos em três pontos do sis
 
 ---
 
-## 👨‍💻 Desenvolvedor
+## 👩🏻‍💻🪄 Desenvolvedora
 
 **Desenvolvido com 💜 por Michele Oliveira**
 - GitHub: [@micheleoliveiracod](https://github.com/micheleoliveiracod)

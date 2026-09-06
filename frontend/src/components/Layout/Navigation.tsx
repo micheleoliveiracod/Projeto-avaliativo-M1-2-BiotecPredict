@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import styles from './Navigation.module.css';
+import mark from '../../assets/mark.svg';
 
 const Navigation: React.FC = () => {
   const location = useLocation();
@@ -8,9 +9,12 @@ const Navigation: React.FC = () => {
   return (
     <nav className={styles.nav}>
       <div className={styles.container}>
-        <div className={styles.logo}>
-          <Link to="/">BiotecPredict</Link>
-        </div>
+        <Link to="/" className={styles.logo}>
+          <img src={mark} alt="" width={28} height={17} className={styles.logoMark} />
+          <span>
+            Biotec<em>Predict</em>
+          </span>
+        </Link>
         <ul className={styles.menu}>
           <li>
             <Link 

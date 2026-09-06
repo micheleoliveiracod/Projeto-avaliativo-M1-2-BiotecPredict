@@ -2,7 +2,6 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Layout from './components/Layout/Layout';
 import Upload from './pages/Upload/Upload';
 import Dashboard from './pages/Dashboard/Dashboard';
-import './App.module.css';
 
 function App() {
   return (
