@@ -12,8 +12,6 @@
 
 ---
 
-# BiotecPredict
-
 **Plataforma de Manufatura Preditiva para a Indústria de Biotecnologia**
 
 **Desenvolvido por:** [Michele Oliveira](https://github.com/micheleoliveiracod)
