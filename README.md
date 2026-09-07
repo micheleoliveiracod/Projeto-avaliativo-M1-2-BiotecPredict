@@ -6,7 +6,7 @@
 ![FastAPI](https://img.shields.io/badge/FastAPI-backend-9184D9?style=flat-square&labelColor=0B0A10)
 ![React](https://img.shields.io/badge/React-frontend-9184D9?style=flat-square&labelColor=0B0A10)
 [![CI](https://github.com/micheleoliveiracod/Projeto-avaliativo-M1-2-BiotecPredict/actions/workflows/ci.yml/badge.svg)](https://github.com/micheleoliveiracod/Projeto-avaliativo-M1-2-BiotecPredict/actions/workflows/ci.yml)
-![License](https://img.shields.io/badge/licenca-Apache--2.0-9184D9?style=flat-square&labelColor=0B0A10)
+![License](https://img.shields.io/badge/licenca-Todos%20os%20direitos%20reservados-9184D9?style=flat-square&labelColor=0B0A10)
 
 </div>
 
@@ -542,7 +542,7 @@ A IA (Claude Sonnet 4.6) gerou código com erros lógicos em três pontos do sis
 | M07 | Caso documentado de saída incorreta da IA | ✅ Completo | 3 casos reais documentados em [docs/m07-saida-incorreta-ia.md](docs/m07-saida-incorreta-ia.md) |
 | M08 | Melhorias futuras | ✅ Completo | Roadmap em 4 fases |
 | M09 | Link do vídeo no YouTube | ✅ Completo | https://youtu.be/9Pax-hNaamo |
-| M10 | LICENSE | ✅ Completo | Apache License 2.0 |
+| M10 | LICENSE | ✅ Completo | Todos os direitos reservados |
 ---
 
 ## 📚 Documentação Adicional
@@ -592,5 +592,9 @@ Consulte [GitFlow](.specs/gitflow.md) para mais detalhes.
 
 ## 📄 Licença do Projeto
 
-Este projeto está licenciado sob a **Apache License 2.0**.
+Este projeto está sob **Copyright (c) 2026 Michele Oliveira. Todos os
+direitos reservados.** Ver [LICENSE](LICENSE) para os termos completos.
+O código é público neste repositório apenas para fins de avaliação
+acadêmica do curso IA para DEVs (Programa SCTEC/SENAI); isso não
+concede licença de uso, cópia ou distribuição.
 
