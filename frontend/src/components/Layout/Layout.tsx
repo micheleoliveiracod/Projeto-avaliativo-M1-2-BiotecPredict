@@ -14,7 +14,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         {children}
       </main>
       <footer className={styles.footer}>
-        <p>&copy; 2026 BiotecPredict. Todos os direitos reservados.</p>
+        <p>&copy; 2026 BiotecPredict — Michele Oliveira. Todos os direitos reservados.</p>
       </footer>
     </div>
   );
