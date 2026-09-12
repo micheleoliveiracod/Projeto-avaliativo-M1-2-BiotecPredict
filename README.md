@@ -579,17 +579,6 @@ A IA (Claude Sonnet 4.6) gerou código com erros lógicos em três pontos do sis
 
 ---
 
-## 🤝 Contribuindo
-
-1. Crie uma branch para sua feature: `git checkout -b feature/sua-feature`
-2. Commit suas mudanças: `git commit -m 'feat: descrição da feature'`
-3. Push para a branch: `git push origin feature/sua-feature`
-4. Abra um Pull Request
-
-Consulte [GitFlow](.specs/gitflow.md) para mais detalhes.
-
----
-
 ## 📄 Licença do Projeto
 
 Este projeto está sob **Copyright (c) 2026 Michele Oliveira. Todos os
